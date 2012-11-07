@@ -4,3 +4,6 @@
 *.jar
 *.war
 *.ear
+
+# Custom ignore for bin folder
+bin/
