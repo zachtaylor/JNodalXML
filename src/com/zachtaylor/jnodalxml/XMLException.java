@@ -1,4 +1,4 @@
-package com.zachtaylor.nodalxml;
+package com.zachtaylor.jnodalxml;
 
 public class XMLException extends Exception {
   public XMLException(String message) {

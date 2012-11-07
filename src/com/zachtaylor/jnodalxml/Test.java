@@ -1,4 +1,4 @@
-package com.zachtaylor.nodalxml;
+package com.zachtaylor.jnodalxml;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
