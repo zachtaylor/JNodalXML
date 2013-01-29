@@ -5,43 +5,88 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class XMLNode {
   public XMLNode(String nodeName) {
-    this.nodeName = nodeName;
+    name = nodeName;
+
+    value = null;
+    children = null;
+    selfClosing = false;
   }
 
-  public void addChild(XMLNode child) {
-    children.add(child);
+  public Collection<XMLNode> getAllChildren() {
+    return Collections.unmodifiableCollection(children);
   }
 
   public List<XMLNode> getChildren(String nodeName) {
     List<XMLNode> val = new ArrayList<XMLNode>();
 
+    if (children == null)
+      return val;
+
     for (XMLNode node : children) {
-      if (node.nodeName.equals(nodeName))
+      if (node.name.equals(nodeName))
         val.add(node);
     }
 
     return val;
   }
 
-  public void addAttribute(String key, String value) {
-    if (attributes.get(key) != null)
-      throw new IllegalArgumentException();
+  public XMLNode addChild(String childName) throws XMLException {
+    return addChild(new XMLNode(childName));
+  }
 
-    attributes.put(key, value);
+  public XMLNode addChild(XMLNode n) throws XMLException {
+    if (selfClosing)
+      throw new XMLException("Cannot add children to self-closing XMLNode");
+    if (children == null)
+      children = new ArrayList<XMLNode>();
+
+    children.add(n);
+    return n;
   }
 
   public String getAttribute(String key) {
     return attributes.get(key);
   }
 
+  public void setAttribute(String key, String value) {
+    if (attributes.get(key) != null)
+      throw new IllegalArgumentException();
+
+    attributes.put(key, value);
+  }
+
+  public void setSelfClosing(boolean b) throws XMLException {
+    if (children != null && b)
+      throw new XMLException("Cannot set self closing of XMLNode with children");
+    if (value != null && b)
+      throw new XMLException("Cannot set self closing of XMLNode with value");
+
+    selfClosing = b;
+  }
+
   public boolean isSelfClosing() {
-    return children.isEmpty();
+    return selfClosing;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String s) throws XMLException {
+    if (selfClosing)
+      throw new XMLException("Cannot set value of self closing XMLNode");
+    if (children != null)
+      throw new XMLException("Cannot set value of XMLNode which has children");
+
+    value = s;
   }
 
   public String toString() {
@@ -55,7 +100,7 @@ public class XMLNode {
       sb.append("\t");
 
     sb.append("<");
-    sb.append(nodeName);
+    sb.append(name);
 
     for (Map.Entry<String, String> entry : attributes.entrySet()) {
       sb.append(" ");
@@ -76,7 +121,7 @@ public class XMLNode {
         sb.append("\t");
 
       sb.append("</");
-      sb.append(nodeName);
+      sb.append(name);
       sb.append(">\n");
     }
     else {
@@ -123,7 +168,7 @@ public class XMLNode {
         throw new XMLException("Illegal format for line: " + line);
       val = val.substring(1, val.length() - 1);
 
-      node.addAttribute(attr, val);
+      node.setAttribute(attr, val);
     }
 
     XMLNode child = XMLNode.doFromFile(br);
@@ -141,7 +186,7 @@ public class XMLNode {
 
     XMLNode node = (XMLNode) o;
 
-    if (!nodeName.equals(node.nodeName))
+    if (!name.equals(node.name))
       return false;
     if (!children.equals(node.children))
       return false;
@@ -152,10 +197,11 @@ public class XMLNode {
   }
 
   public int hashCode() {
-    return nodeName.hashCode();
+    return name.hashCode();
   }
 
-  private String nodeName;
-  private List<XMLNode> children = new ArrayList<XMLNode>();
+  private boolean selfClosing;
+  private String name, value;
+  private List<XMLNode> children;
   private Map<String, String> attributes = new HashMap<String, String>();
 }
