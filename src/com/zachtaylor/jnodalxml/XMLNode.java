@@ -1,9 +1,5 @@
 package com.zachtaylor.jnodalxml;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -129,55 +125,6 @@ public class XMLNode {
     }
 
     return sb.toString();
-  }
-
-  //@preformat
-  public static XMLNode fromFile(String fileName) throws FileNotFoundException, IOException, XMLException {
-    //@format
-    return doFromFile(new BufferedReader(new FileReader(fileName)));
-  }
-
-  //@preformat
-  public static XMLNode doFromFile(BufferedReader br) throws IOException, XMLException {
-    //@format
-    String line = br.readLine().trim();
-
-    if (line.startsWith("</") && line.endsWith(">"))
-      return null;
-
-    if (line.charAt(0) != '<' || !line.endsWith(">"))
-      throw new XMLException("Illegal format for line: " + line);
-
-    line = line.substring(1, line.length() - 1);
-
-    String[] pieces = line.split(" ");
-    String[] attrPieces;
-    String attr, val;
-
-    XMLNode node = new XMLNode(pieces[0]);
-
-    for (int i = 1; i < pieces.length; i++) {
-      if (pieces[i].equals("/"))
-        return node;
-
-      attrPieces = pieces[i].split("=");
-      attr = attrPieces[0];
-      val = attrPieces[1];
-
-      if (!val.startsWith("\"") || !val.endsWith("\""))
-        throw new XMLException("Illegal format for line: " + line);
-      val = val.substring(1, val.length() - 1);
-
-      node.setAttribute(attr, val);
-    }
-
-    XMLNode child = XMLNode.doFromFile(br);
-    while (child != null) {
-      node.addChild(child);
-      child = XMLNode.doFromFile(br);
-    }
-
-    return node;
   }
 
   public boolean equals(Object o) {
