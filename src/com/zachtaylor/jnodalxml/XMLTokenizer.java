@@ -3,7 +3,6 @@ package com.zachtaylor.jnodalxml;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -62,6 +61,9 @@ public class XMLTokenizer {
       if (string.startsWith("\"") && string.endsWith("\"")) {
         string = string.substring(0, string.length() - 1);
         tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_KEY, string));
+      }
+      else if (string.length() > 0) {
+        tokens.add(new XMLToken(XMLTokenType.NODE_VALUE, string));
       }
       if (hasClosing) {
         tokens.add(new XMLToken(XMLTokenType.CLOSE_BRACKET));
