@@ -45,27 +45,29 @@ public class XMLNode {
       children = new ArrayList<XMLNode>();
 
     children.add(n);
-    return n;
+    return this;
   }
 
   public String getAttribute(String key) {
     return attributes.get(key);
   }
 
-  public void setAttribute(String key, String value) {
+  public XMLNode setAttribute(String key, String value) throws XMLException {
     if (attributes.get(key) != null)
-      throw new IllegalArgumentException();
+      throw new XMLException("Cannot reset attribute value");
 
     attributes.put(key, value);
+    return this;
   }
 
-  public void setSelfClosing(boolean b) throws XMLException {
+  public XMLNode setSelfClosing(boolean b) throws XMLException {
     if (children != null && b)
       throw new XMLException("Cannot set self closing of XMLNode with children");
     if (value != null && b)
       throw new XMLException("Cannot set self closing of XMLNode with value");
 
     selfClosing = b;
+    return this;
   }
 
   public boolean isSelfClosing() {
@@ -76,13 +78,14 @@ public class XMLNode {
     return value;
   }
 
-  public void setValue(String s) throws XMLException {
+  public XMLNode setValue(String s) throws XMLException {
     if (selfClosing)
       throw new XMLException("Cannot set value of self closing XMLNode");
     if (children != null)
       throw new XMLException("Cannot set value of XMLNode which has children");
 
     value = s;
+    return this;
   }
 
   public String toString() {
@@ -135,7 +138,13 @@ public class XMLNode {
 
     if (!name.equals(node.name))
       return false;
-    if (!children.equals(node.children))
+    if (value != null && !value.equals(node.value))
+      return false;
+    if (value == null && node.value != null)
+      return false;
+    if (children != null && !children.equals(node.children))
+      return false;
+    if (children == null && node.children != null)
       return false;
     if (!attributes.equals(node.attributes))
       return false;
