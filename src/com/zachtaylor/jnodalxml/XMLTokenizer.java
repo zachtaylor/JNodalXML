@@ -29,46 +29,89 @@ public class XMLTokenizer {
   }
 
   private void parse(Scanner scan) {
-    String string;
-    boolean hasClosing;
-    int equalsIndex, slashIndex;
+    String string = "";
+    boolean inBrackets = false, hasName = false;
 
-    while (scan.hasNext()) {
-      hasClosing = false;
-      string = scan.next();
-
-      if (string.charAt(0) == '<') {
-        tokens.add(new XMLToken(XMLTokenType.OPEN_BRACKET));
-        string = string.substring(1);
-      }
-      if (string.endsWith(">")) {
-        hasClosing = true;
-        string = string.substring(0, string.lastIndexOf('>'));
-      }
-
-      equalsIndex = string.indexOf('=');
-      slashIndex = string.indexOf("\"");
-
-      if (equalsIndex > 0 && (slashIndex == -1 || slashIndex > equalsIndex)) {
-        tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_KEY, string.substring(0, equalsIndex)));
-        tokens.add(new XMLToken(XMLTokenType.EQUALS));
-        string = string.substring(equalsIndex + 1);
+    while (scan.hasNext() || string.length() > 0) {
+      if (string.length() == 0) {
+        string = scan.next();
       }
       if (string.startsWith("/")) {
         tokens.add(new XMLToken(XMLTokenType.SLASH));
         string = string.substring(1);
       }
-      if (string.startsWith("\"") && string.endsWith("\"")) {
-        string = string.substring(0, string.length() - 1);
-        tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_KEY, string));
-      }
-      else if (string.length() > 0) {
-        tokens.add(new XMLToken(XMLTokenType.NODE_VALUE, string));
-      }
-      if (hasClosing) {
+      if (string.startsWith(">")) {
         tokens.add(new XMLToken(XMLTokenType.CLOSE_BRACKET));
+        inBrackets = false;
+        string = string.substring(1);
+      }
+      if (string.startsWith("<")) {
+        tokens.add(new XMLToken(XMLTokenType.OPEN_BRACKET));
+        inBrackets = true;
+        hasName = false;
+        string = string.substring(1);
+      }
+      if (string.startsWith("=")) {
+        tokens.add(new XMLToken(XMLTokenType.EQUALS));
+        string = string.substring(1);
+      }
+      if (string.startsWith("\"")) {
+        string = string.substring(1, string.length());
+
+        while (!string.contains("\""))
+          string.concat(scan.next());
+
+        int quoteIndex = string.indexOf("\"");
+        tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_VALUE, string.substring(
+            0, quoteIndex)));
+        string = string.substring(quoteIndex + 1);
+        continue;
+      }
+      if (string.length() > 0) {
+        String usablePart;
+        int specialCharacterIndex = specialCharacterIndex(string);
+
+        if (specialCharacterIndex == 0) {
+          continue;
+        }
+        else if (specialCharacterIndex > 0) {
+          usablePart = string.substring(0, specialCharacterIndex);
+          string = string.substring(specialCharacterIndex);
+        }
+        else {
+          usablePart = string;
+          string = "";
+        }
+
+        if (inBrackets) {
+          if (hasName) {
+            tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_KEY, usablePart));
+          }
+          else {
+            tokens.add(new XMLToken(XMLTokenType.NODE_NAME, usablePart));
+            hasName = true;
+          }
+        }
+        else {
+          tokens.add(new XMLToken(XMLTokenType.NODE_VALUE, usablePart));
+        }
       }
     }
+  }
+
+  private int specialCharacterIndex(String string) {
+    int lowestIndex = -1;
+    char[] chars = { '/', '>', '<', '=' };
+
+    for (char c : chars) {
+      int index = string.indexOf(c);
+
+      if (index >= 0 && (lowestIndex == -1 || index < lowestIndex)) {
+        lowestIndex = index;
+      }
+    }
+
+    return lowestIndex;
   }
 
   private Queue<XMLToken> tokens = new LinkedList<XMLToken>();

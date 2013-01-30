@@ -108,8 +108,11 @@ public class XMLNode {
       sb.append(entry.getValue());
       sb.append("\"");
     }
-
-    if (!isSelfClosing()) {
+    
+    if (isSelfClosing()) {
+      sb.append(" />\n");
+    }
+    else if (children != null) {
       sb.append(">\n");
 
       for (XMLNode node : children) {
@@ -124,7 +127,16 @@ public class XMLNode {
       sb.append(">\n");
     }
     else {
-      sb.append(" />\n");
+      sb.append("> ");
+      
+      if (value != null) {
+        sb.append(value);
+        sb.append(" ");
+      }
+      
+      sb.append("</");
+      sb.append(name);
+      sb.append(">\n");
     }
 
     return sb.toString();
