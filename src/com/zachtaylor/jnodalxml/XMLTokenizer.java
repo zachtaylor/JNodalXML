@@ -59,7 +59,7 @@ public class XMLTokenizer {
         string = string.substring(1, string.length());
 
         while (!string.contains("\""))
-          string.concat(scan.next());
+          string = string.concat(" ").concat(scan.next());
 
         int quoteIndex = string.indexOf("\"");
         tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_VALUE, string.substring(
