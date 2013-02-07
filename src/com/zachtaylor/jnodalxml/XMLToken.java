@@ -14,8 +14,18 @@ public class XMLToken {
     return value;
   }
 
+  public void setValue(String v) {
+    value = v;
+  }
+
   public XMLTokenType getType() {
     return type;
+  }
+
+  public String toString() {
+    if (value != null)
+      return type.name() + " : " + value;
+    return type.name();
   }
 
   private String value;

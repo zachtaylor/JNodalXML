@@ -1,14 +1,14 @@
 package com.zachtaylor.jnodalxml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
 public class XMLTokenizer {
-  public XMLTokenizer(File f) throws IOException {
+  public XMLTokenizer(File f) throws FileNotFoundException {
     Scanner scan = new Scanner(new FileReader(f));
     parse(scan);
     scan.close();
@@ -28,75 +28,95 @@ public class XMLTokenizer {
     return tokens.remove();
   }
 
+  public XMLToken peek() {
+    return tokens.peek();
+  }
+
   private void parse(Scanner scan) {
     String string = "";
-    boolean inBrackets = false, hasName = false;
+    boolean inBrackets = false, inQuotes = false;
 
     while (scan.hasNext() || string.length() > 0) {
       if (string.length() == 0) {
         string = scan.next();
       }
-      if (string.startsWith("/")) {
-        tokens.add(new XMLToken(XMLTokenType.SLASH));
-        string = string.substring(1);
-      }
-      if (string.startsWith(">")) {
-        tokens.add(new XMLToken(XMLTokenType.CLOSE_BRACKET));
-        inBrackets = false;
-        string = string.substring(1);
-      }
-      if (string.startsWith("<")) {
-        tokens.add(new XMLToken(XMLTokenType.OPEN_BRACKET));
-        inBrackets = true;
-        hasName = false;
-        string = string.substring(1);
-      }
-      if (string.startsWith("=")) {
-        tokens.add(new XMLToken(XMLTokenType.EQUALS));
-        string = string.substring(1);
-      }
-      if (string.startsWith("\"")) {
-        string = string.substring(1, string.length());
 
-        while (!string.contains("\""))
+      if (string.startsWith("<!--")) {
+        // Throw away comments in the Scanner
+        string = string.substring(4);
+
+        int endChar = string.indexOf("-->");
+        while (endChar == -1) {
           string = string.concat(" ").concat(scan.next());
-
-        int quoteIndex = string.indexOf("\"");
-        tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_VALUE, string.substring(
-            0, quoteIndex)));
-        string = string.substring(quoteIndex + 1);
-        continue;
-      }
-      if (string.length() > 0) {
-        String usablePart;
-        int specialCharacterIndex = specialCharacterIndex(string);
-
-        if (specialCharacterIndex == 0) {
-          continue;
         }
-        else if (specialCharacterIndex > 0) {
-          usablePart = string.substring(0, specialCharacterIndex);
-          string = string.substring(specialCharacterIndex);
+        string = string.substring(endChar + 3);
+      }
+      else if (inBrackets) {
+        if (string.startsWith("\"")) {
+          add(new XMLToken(XMLTokenType.QUOTE));
+          string = string.substring(1);
+          inQuotes = !inQuotes;
+        }
+        else if (inQuotes) {
+          int qChar = string.indexOf('"');
+
+          if (qChar < 0) {
+            add(new XMLToken(XMLTokenType.TEXT, string));
+            string = "";
+          }
+          else if (qChar > 0) {
+            add(new XMLToken(XMLTokenType.TEXT, string.substring(0, qChar)));
+            string = string.substring(qChar);
+          }
+        }
+        else if (string.startsWith("/")) {
+          add(new XMLToken(XMLTokenType.SLASH));
+          string = string.substring(1);
+        }
+        else if (string.startsWith("=")) {
+          add(new XMLToken(XMLTokenType.EQUALS));
+          string = string.substring(1);
+        }
+        else if (string.startsWith(">")) {
+          add(new XMLToken(XMLTokenType.CLOSE_BRACKET));
+          string = string.substring(1);
+          inBrackets = false;
         }
         else {
-          usablePart = string;
+          int sChar = specialCharacterIndex(string);
+
+          if (sChar < 0) {
+            add(new XMLToken(XMLTokenType.TEXT, string));
+            string = "";
+          }
+          else if (sChar > 0) {
+            add(new XMLToken(XMLTokenType.TEXT, string.substring(0, sChar)));
+            string = string.substring(sChar);
+          }
+        }
+      }
+      else if (string.startsWith("<")) {
+        add(new XMLToken(XMLTokenType.OPEN_BRACKET));
+        string = string.substring(1);
+        inBrackets = true;
+      }
+      else {
+        int sChar = string.indexOf('<');
+
+        if (sChar < 0) {
+          add(new XMLToken(XMLTokenType.TEXT, string));
           string = "";
         }
-
-        if (inBrackets) {
-          if (hasName) {
-            tokens.add(new XMLToken(XMLTokenType.ATTRIBUTE_KEY, usablePart));
-          }
-          else {
-            tokens.add(new XMLToken(XMLTokenType.NODE_NAME, usablePart));
-            hasName = true;
-          }
-        }
-        else {
-          tokens.add(new XMLToken(XMLTokenType.NODE_VALUE, usablePart));
+        else if (sChar > 0) {
+          add(new XMLToken(XMLTokenType.TEXT, string.substring(0, sChar)));
+          string = string.substring(sChar);
         }
       }
     }
+  }
+
+  private void add(XMLToken token) {
+    tokens.add(token);
   }
 
   private int specialCharacterIndex(String string) {

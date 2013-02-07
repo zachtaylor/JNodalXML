@@ -15,6 +15,10 @@ public class XMLNode {
     children = null;
     selfClosing = false;
   }
+  
+  public String getName() {
+    return name;
+  }
 
   public Collection<XMLNode> getAllChildren() {
     return Collections.unmodifiableCollection(children);
