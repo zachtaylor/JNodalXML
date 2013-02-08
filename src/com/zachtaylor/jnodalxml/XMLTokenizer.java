@@ -41,7 +41,25 @@ public class XMLTokenizer {
         string = scan.next();
       }
 
-      if (string.startsWith("<!--")) {
+      if (inQuotes) {
+        int qChar = string.indexOf('"');
+
+        if (qChar < 0) {
+          add(new XMLToken(XMLTokenType.TEXT, string));
+          string = "";
+        }
+        else {
+          if (qChar > 0) {
+            add(new XMLToken(XMLTokenType.TEXT, string.substring(0, qChar)));
+            string = string.substring(qChar);
+          }
+          add(new XMLToken(XMLTokenType.QUOTE));
+          string = string.substring(1);
+          inQuotes = false;
+        }
+
+      }
+      else if (string.startsWith("<!--")) {
         // Throw away comments in the Scanner
         string = string.substring(4);
 
@@ -55,19 +73,7 @@ public class XMLTokenizer {
         if (string.startsWith("\"")) {
           add(new XMLToken(XMLTokenType.QUOTE));
           string = string.substring(1);
-          inQuotes = !inQuotes;
-        }
-        else if (inQuotes) {
-          int qChar = string.indexOf('"');
-
-          if (qChar < 0) {
-            add(new XMLToken(XMLTokenType.TEXT, string));
-            string = "";
-          }
-          else if (qChar > 0) {
-            add(new XMLToken(XMLTokenType.TEXT, string.substring(0, qChar)));
-            string = string.substring(qChar);
-          }
+          inQuotes = true;
         }
         else if (string.startsWith("/")) {
           add(new XMLToken(XMLTokenType.SLASH));
