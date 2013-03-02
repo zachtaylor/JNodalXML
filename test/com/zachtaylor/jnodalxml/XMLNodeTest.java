@@ -51,8 +51,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testMultipleAttributes() {
-    node.setAttribute("key1", "value1").setAttribute("key2", "value2")
-        .setAttribute("key3", "value3");
+    node.setAttribute("key1", "value1").setAttribute("key2", "value2").setAttribute("key3", "value3");
 
     assertEquals("value1", node.getAttribute("key1"));
     assertEquals("value2", node.getAttribute("key2"));
@@ -77,7 +76,7 @@ public class XMLNodeTest extends TestCase {
 
     other.setAttribute("key", "value");
 
-    assertTrue(!other.equals(node));
+    assertFalse(other.equals(node));
 
     other = new XMLNode("name");
 
@@ -85,7 +84,7 @@ public class XMLNodeTest extends TestCase {
 
     node.setAttribute("key", "value");
 
-    assertTrue(!other.equals(node));
+    assertFalse(other.equals(node));
   }
 
   public void testChild() {
@@ -114,5 +113,16 @@ public class XMLNodeTest extends TestCase {
 
     assertEquals(child1, node.getChildren("child1").get(0));
     assertEquals(child2, node.getChildren("child2").get(0));
+  }
+
+  public void testCannotSetValueOfSelfClosing() {
+    node.setSelfClosing(true);
+
+    try {
+      node.setValue("value");
+      fail("This should die");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
   }
 }
