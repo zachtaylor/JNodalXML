@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class XMLTokenParser {
+public class XMLParser {
   public static List<XMLNode> parse(File f) throws FileNotFoundException {
     return parse(new XMLTokenizer(f));
   }
