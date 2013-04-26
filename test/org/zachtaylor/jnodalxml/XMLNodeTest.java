@@ -1,4 +1,4 @@
-package com.zachtaylor.jnodalxml;
+package org.zachtaylor.jnodalxml;
 
 import junit.framework.TestCase;
 
@@ -48,6 +48,12 @@ public class XMLNodeTest extends TestCase {
     node.setAttribute("key", "value");
 
     assertEquals("value", node.getAttribute("key"));
+  }
+
+  public void testAttributeCasts() {
+    node.setAttribute("int", 42);
+    assertEquals(42, node.getIntAttribute("int"));
+    
   }
 
   public void testMultipleAttributes() {

@@ -1,4 +1,4 @@
-package com.zachtaylor.jnodalxml;
+package org.zachtaylor.jnodalxml;
 
 public class XMLException extends RuntimeException {
   public XMLException(String message) {

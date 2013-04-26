@@ -1,4 +1,4 @@
-package com.zachtaylor.jnodalxml;
+package org.zachtaylor.jnodalxml;
 
 import java.io.File;
 import java.io.FileNotFoundException;

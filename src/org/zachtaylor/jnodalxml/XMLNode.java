@@ -1,4 +1,4 @@
-package com.zachtaylor.jnodalxml;
+package org.zachtaylor.jnodalxml;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,10 +15,6 @@ public class XMLNode {
    */
   public XMLNode(String nodeName) {
     name = nodeName;
-
-    value = null;
-    children = null;
-    selfClosing = false;
   }
 
   /**
@@ -65,7 +61,7 @@ public class XMLNode {
    * @param childName Name of the child node to add
    * @return This node
    * @throws XMLException If the child cannot be added, for instance if this
-   *           node is self-closing or has value
+   *         node is self-closing or has value
    */
   public XMLNode addChild(String childName) throws XMLException {
     return addChild(new XMLNode(childName));
@@ -77,7 +73,7 @@ public class XMLNode {
    * @param n Child node to add
    * @return This node
    * @throws XMLException If the child cannot be added, for instance if this
-   *           node is self-closing or has value
+   *         node is self-closing or has value
    */
   public XMLNode addChild(XMLNode n) throws XMLException {
     if (selfClosing)
@@ -90,13 +86,66 @@ public class XMLNode {
   }
 
   /**
+   * Tells whether an attribute has been set on this node. It is good practice
+   * to test if an attribute has been set before setting or deleting
+   * 
+   * @param key Key to test for
+   * @return True if this attribute has been set
+   */
+  public boolean hasAttribute(String key) {
+    return attributes.get(key) != null;
+  }
+
+  /**
+   * Getter for all of the attribute keys
+   * 
+   * @return An unmodifiable collection of string keys
+   */
+  public Collection<String> attributeKeys() {
+    return Collections.unmodifiableCollection(attributes.keySet());
+  }
+
+  /**
    * Getter for an attribute of this node
    * 
    * @param key Attribute name
-   * @return Value assigned to the attribute name
+   * @return Value assigned to the attribute name. Null if attribute has not
+   *         been set
    */
   public String getAttribute(String key) {
     return attributes.get(key);
+  }
+
+  /**
+   * Gets an attribute of this node, and calls Integer.parseInt for convenience
+   * 
+   * @param key Attribute name
+   * @return Value assigned to the attribute name as Integer
+   */
+  public int getIntAttribute(String key) {
+    return Integer.parseInt(getAttribute(key));
+  }
+
+  /**
+   * Gets an attribute of this node, and calls Double.parseDouble for
+   * convenience
+   * 
+   * @param key Attribute name
+   * @return Value assigned to the attribute name as Double
+   */
+  public double getDoubleAttribute(String key) {
+    return Double.parseDouble(getAttribute(key));
+  }
+
+  /**
+   * Gets an attribute of this node, and calls Boolean.parseBoolean for
+   * convenience
+   * 
+   * @param key Attribute name
+   * @return Value assigned to the attribute name as Boolean
+   */
+  public boolean getBoolAttribute(String key) {
+    return Boolean.parseBoolean(getAttribute(key));
   }
 
   /**
@@ -113,6 +162,92 @@ public class XMLNode {
 
     attributes.put(key, value);
     return this;
+  }
+
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XMLException If the key was previously assigned to another value
+   */
+  public XMLNode setAttribute(String key, int value) throws XMLException {
+    return setAttribute(key, Integer.toString(value));
+  }
+
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XMLException If the key was previously assigned to another value
+   */
+  public XMLNode setAttribute(String key, double value) throws XMLException {
+    return setAttribute(key, Double.toString(value));
+  }
+
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XMLException If the key was previously assigned to another value
+   */
+  public XMLNode setAttribute(String key, boolean value) throws XMLException {
+    return setAttribute(key, Boolean.toString(value));
+  }
+
+  /**
+   * Removes an attribute from this node
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XMLException If there was no such attribute assigned on this node
+   */
+  public String removeAttribute(String key) throws XMLException {
+    if (attributes.get(key) == null)
+      throw new XMLException("Attribute does not exist");
+
+    return attributes.remove(key);
+  }
+
+  /**
+   * Removes an attribute from this node, and calls Integer.parseInt on the old
+   * value for convenience
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XMLException If there was no such attribute assigned on this node
+   */
+  public int removeIntAttribute(String key) throws XMLException {
+    return Integer.parseInt(removeAttribute(key));
+  }
+
+  /**
+   * Removes an attribute from this node, and calls Double.parseDouble on the
+   * old value for convenience
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XMLException If there was no such attribute assigned on this node
+   */
+  public double removeDoubleAttribute(String key) throws XMLException {
+    return Double.parseDouble(removeAttribute(key));
+  }
+
+  /**
+   * Removes an attribute from this node, and calls Boolean.parseBoolean on the
+   * old value for convenience
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XMLException If there was no such attribute assigned on this node
+   */
+  public boolean removeBoolAttribute(String key) {
+    return Boolean.parseBoolean(removeAttribute(key));
   }
 
   /**
@@ -247,8 +382,8 @@ public class XMLNode {
     return name.hashCode();
   }
 
-  private boolean selfClosing;
-  private String name, value;
-  private List<XMLNode> children;
+  private String name, value = null;
+  private boolean selfClosing = false;
+  private List<XMLNode> children = null;
   private Map<String, String> attributes = new HashMap<String, String>();
 }

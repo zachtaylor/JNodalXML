@@ -1,4 +1,4 @@
-package com.zachtaylor.jnodalxml;
+package org.zachtaylor.jnodalxml;
 
 public class XMLToken {
   public XMLToken(XMLTokenType t, String s) {
