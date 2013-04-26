@@ -1,12 +1,22 @@
 package org.zachtaylor.jnodalxml;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 public class XMLNodeTest extends TestCase {
   static XMLNode node;
 
+  static String NODE_NAME = "name";
+
   public void setUp() throws Exception {
-    node = new XMLNode("name");
+    node = new XMLNode(NODE_NAME);
+  }
+
+  public void testName() {
+    assertEquals(NODE_NAME, node.getName());
   }
 
   public void testValue() {
@@ -16,7 +26,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testValueEquals() {
-    XMLNode other = new XMLNode("name");
+    XMLNode other = new XMLNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -27,7 +37,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testValueNotEquals() {
-    XMLNode other = new XMLNode("name");
+    XMLNode other = new XMLNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -35,7 +45,7 @@ public class XMLNodeTest extends TestCase {
 
     assertTrue(!other.equals(node));
 
-    other = new XMLNode("name");
+    other = new XMLNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -50,10 +60,100 @@ public class XMLNodeTest extends TestCase {
     assertEquals("value", node.getAttribute("key"));
   }
 
+  public void testAttributeHasAndRemove() {
+    node.setAttribute("key1", "val1");
+
+    assertTrue(node.hasAttribute("key1"));
+
+    node.removeAttribute("key1");
+
+    assertTrue(!node.hasAttribute("key1"));
+
+    try {
+      node.removeAttribute("key1");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+  }
+
+  public void testAttributeSet() {
+    List<String> keys = new ArrayList<String>();
+
+    keys.add("key1");
+    keys.add("key2");
+    keys.add("key3");
+
+    for (String key : keys) {
+      node.setAttribute(key, "value");
+    }
+
+    Collection<String> attributeKeys = node.attributeKeys();
+
+    assertEquals(keys.size(), attributeKeys.size());
+    assertTrue(attributeKeys.containsAll(keys));
+  }
+
+  public void testAttributeNulls() {
+    try {
+      node.setAttribute(null, "value");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+
+    try {
+      node.setAttribute("key", null);
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+
+    try {
+      node.removeAttribute("key");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+  }
+
+  public void testCannotResetAttribute() {
+    node.setAttribute("key", "value");
+
+    try {
+      node.setAttribute("key", "newValue");
+      fail("Should not allow reset of key \"key\"");
+    } catch (XMLException e) {
+    }
+  }
+
   public void testAttributeCasts() {
-    node.setAttribute("int", 42);
-    assertEquals(42, node.getIntAttribute("int"));
-    
+    int my_int = 42;
+    double my_double = 3.14;
+    boolean my_boolean = true;
+
+    // int
+    node.setAttribute("int", my_int);
+    assertEquals(my_int, node.getIntAttribute("int"));
+    node.removeAttribute("int");
+    node.setAttribute("int", my_int + "");
+    assertEquals(my_int, node.getIntAttribute("int"));
+    assertEquals(my_int, node.removeIntAttribute("int"));
+    assertTrue(!node.hasAttribute("int"));
+
+    // double
+    node.setAttribute("double", my_double);
+    assertEquals(my_double, node.getDoubleAttribute("double"));
+    node.removeAttribute("double");
+    node.setAttribute("double", my_double + "");
+    assertEquals(my_double, node.getDoubleAttribute("double"));
+    assertEquals(my_double, node.removeDoubleAttribute("double"));
+    assertTrue(!node.hasAttribute("double"));
+
+    // boolean
+    node.setAttribute("boolean", my_boolean);
+    assertEquals(my_boolean, node.getBoolAttribute("boolean"));
+    node.removeAttribute("boolean");
+    node.setAttribute("boolean", my_boolean + "");
+    assertEquals(my_boolean, node.getBoolAttribute("boolean"));
+    assertEquals(my_boolean, node.removeBoolAttribute("boolean"));
+    assertTrue(!node.hasAttribute("boolean"));
   }
 
   public void testMultipleAttributes() {
@@ -65,7 +165,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testAttributeEquals() {
-    XMLNode other = new XMLNode("name");
+    XMLNode other = new XMLNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -76,7 +176,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testAttributeNotEquals() {
-    XMLNode other = new XMLNode("name");
+    XMLNode other = new XMLNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -84,7 +184,7 @@ public class XMLNodeTest extends TestCase {
 
     assertFalse(other.equals(node));
 
-    other = new XMLNode("name");
+    other = new XMLNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -101,16 +201,6 @@ public class XMLNodeTest extends TestCase {
     assertEquals(child, node.getChildren("child").get(0));
   }
 
-  public void testCannotResetAttribute() {
-    node.setAttribute("key", "value");
-
-    try {
-      node.setAttribute("key", "newValue");
-      fail("Should not allow reset of key \"key\"");
-    } catch (XMLException e) {
-    }
-  }
-
   public void testChildren() {
     XMLNode child1 = new XMLNode("child1");
     XMLNode child2 = new XMLNode("child2");
@@ -121,7 +211,46 @@ public class XMLNodeTest extends TestCase {
     assertEquals(child2, node.getChildren("child2").get(0));
   }
 
-  public void testCannotSetValueOfSelfClosing() {
+  public void testTwins() {
+    List<XMLNode> nodes = new ArrayList<XMLNode>();
+
+    nodes.add(new XMLNode("child"));
+    nodes.add(new XMLNode("child"));
+    nodes.add(new XMLNode("child"));
+
+    for (XMLNode current_node : nodes) {
+      node.addChild(current_node);
+    }
+
+    List<XMLNode> children = node.getChildren("child");
+
+    assertEquals(nodes.size(), children.size());
+    assertTrue(children.containsAll(nodes));
+  }
+
+  public void testChildrenNullKey() {
+    assertTrue(node.getChildren(null).isEmpty());
+  }
+
+  public void testGetAllChildren() {
+    List<XMLNode> nodes = new ArrayList<XMLNode>();
+
+    nodes.add(new XMLNode("foo"));
+    nodes.add(new XMLNode("bar"));
+    nodes.add(new XMLNode("baz"));
+
+    for (XMLNode current_node : nodes) {
+      node.addChild(current_node);
+    }
+
+    Collection<XMLNode> children = node.getAllChildren();
+
+    assertEquals(nodes.size(), children.size());
+    assertTrue(children.containsAll(nodes));
+  }
+
+  public void testSetValueConflicts() {
+    node = new XMLNode(NODE_NAME);
     node.setSelfClosing(true);
 
     try {
@@ -130,5 +259,71 @@ public class XMLNodeTest extends TestCase {
     } catch (Exception e) {
       assertTrue(e instanceof XMLException);
     }
+
+    node = new XMLNode(NODE_NAME);
+    node.addChild("foo");
+
+    try {
+      node.setValue("value");
+      fail("This should die");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+  }
+
+  public void testAddChildrenConflicts() {
+    node = new XMLNode(NODE_NAME);
+    node.setSelfClosing(true);
+
+    try {
+      node.addChild("child");
+      fail("This should die");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+
+    node = new XMLNode(NODE_NAME);
+    node.setValue("foo");
+
+    try {
+      node.addChild("child");
+      fail("This should die");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+  }
+
+  public void testSetSelfClosingConflicts() {
+    node = new XMLNode(NODE_NAME);
+    node.addChild("foo");
+
+    // In a way, assert no exception
+    node.setSelfClosing(false);
+
+    try {
+      node.setSelfClosing(true);
+      fail("This should die");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+
+    node = new XMLNode(NODE_NAME);
+    node.setValue("foo");
+
+    // In a way, assert no exception
+    node.setSelfClosing(false);
+
+    try {
+      node.setSelfClosing(true);
+      fail("This should die");
+    } catch (Exception e) {
+      assertTrue(e instanceof XMLException);
+    }
+
+    node = new XMLNode(NODE_NAME);
+
+    node.setSelfClosing(true);
+
+    assertTrue(node.isSelfClosing());
   }
 }

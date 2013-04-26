@@ -78,8 +78,12 @@ public class XMLNode {
   public XMLNode addChild(XMLNode n) throws XMLException {
     if (selfClosing)
       throw new XMLException("Cannot add children to self-closing XMLNode");
-    if (children == null)
+    if (value != null)
+      throw new XMLException("Cannot add children to XMLNode with value");
+
+    if (children == null) {
       children = new ArrayList<XMLNode>();
+    }
 
     children.add(n);
     return this;
@@ -154,10 +158,11 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key was previously assigned to another value
+   * @throws XMLException If the key is null, value is null, or was previously
+   *         assigned to another value
    */
   public XMLNode setAttribute(String key, String value) throws XMLException {
-    if (attributes.get(key) != null)
+    if (key == null || value == null || attributes.get(key) != null)
       throw new XMLException("Cannot reset attribute value");
 
     attributes.put(key, value);
@@ -170,7 +175,8 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key was previously assigned to another value
+   * @throws XMLException If the key is null, value is null, or was previously
+   *         assigned to another value
    */
   public XMLNode setAttribute(String key, int value) throws XMLException {
     return setAttribute(key, Integer.toString(value));
@@ -182,7 +188,8 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key was previously assigned to another value
+   * @throws XMLException If the key is null, value is null, or was previously
+   *         assigned to another value
    */
   public XMLNode setAttribute(String key, double value) throws XMLException {
     return setAttribute(key, Double.toString(value));
@@ -194,7 +201,8 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key was previously assigned to another value
+   * @throws XMLException If the key is null, value is null, or was previously
+   *         assigned to another value
    */
   public XMLNode setAttribute(String key, boolean value) throws XMLException {
     return setAttribute(key, Boolean.toString(value));
@@ -205,10 +213,11 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node
+   * @throws XMLException If there was no such attribute assigned on this node,
+   *         or key is null
    */
   public String removeAttribute(String key) throws XMLException {
-    if (attributes.get(key) == null)
+    if (key == null || attributes.get(key) == null)
       throw new XMLException("Attribute does not exist");
 
     return attributes.remove(key);
@@ -220,7 +229,8 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node
+   * @throws XMLException If there was no such attribute assigned on this node,
+   *         or key is null
    */
   public int removeIntAttribute(String key) throws XMLException {
     return Integer.parseInt(removeAttribute(key));
@@ -232,7 +242,8 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node
+   * @throws XMLException If there was no such attribute assigned on this node,
+   *         or key is null
    */
   public double removeDoubleAttribute(String key) throws XMLException {
     return Double.parseDouble(removeAttribute(key));
@@ -244,7 +255,8 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node
+   * @throws XMLException If there was no such attribute assigned on this node,
+   *         or key is null
    */
   public boolean removeBoolAttribute(String key) {
     return Boolean.parseBoolean(removeAttribute(key));
