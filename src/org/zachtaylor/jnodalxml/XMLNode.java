@@ -32,6 +32,9 @@ public class XMLNode {
    * @return An unmodifiable collection of nodes
    */
   public Collection<XMLNode> getAllChildren() {
+    if (children == null)
+      return Collections.unmodifiableCollection(new ArrayList<XMLNode>());
+
     return Collections.unmodifiableCollection(children);
   }
 
@@ -61,7 +64,7 @@ public class XMLNode {
    * @param childName Name of the child node to add
    * @return This node
    * @throws XMLException If the child cannot be added, for instance if this
-   *         node is self-closing or has value
+   *           node is self-closing or has value
    */
   public XMLNode addChild(String childName) throws XMLException {
     return addChild(new XMLNode(childName));
@@ -73,7 +76,7 @@ public class XMLNode {
    * @param n Child node to add
    * @return This node
    * @throws XMLException If the child cannot be added, for instance if this
-   *         node is self-closing or has value
+   *           node is self-closing or has value
    */
   public XMLNode addChild(XMLNode n) throws XMLException {
     if (selfClosing)
@@ -159,7 +162,7 @@ public class XMLNode {
    * @param value Attribute value
    * @return This node
    * @throws XMLException If the key is null, value is null, or was previously
-   *         assigned to another value
+   *           assigned to another value
    */
   public XMLNode setAttribute(String key, String value) throws XMLException {
     if (key == null || value == null || attributes.get(key) != null)
@@ -176,7 +179,7 @@ public class XMLNode {
    * @param value Attribute value
    * @return This node
    * @throws XMLException If the key is null, value is null, or was previously
-   *         assigned to another value
+   *           assigned to another value
    */
   public XMLNode setAttribute(String key, int value) throws XMLException {
     return setAttribute(key, Integer.toString(value));
@@ -189,7 +192,7 @@ public class XMLNode {
    * @param value Attribute value
    * @return This node
    * @throws XMLException If the key is null, value is null, or was previously
-   *         assigned to another value
+   *           assigned to another value
    */
   public XMLNode setAttribute(String key, double value) throws XMLException {
     return setAttribute(key, Double.toString(value));
@@ -202,7 +205,7 @@ public class XMLNode {
    * @param value Attribute value
    * @return This node
    * @throws XMLException If the key is null, value is null, or was previously
-   *         assigned to another value
+   *           assigned to another value
    */
   public XMLNode setAttribute(String key, boolean value) throws XMLException {
     return setAttribute(key, Boolean.toString(value));
@@ -214,7 +217,7 @@ public class XMLNode {
    * @param key Attribute name
    * @return The old value
    * @throws XMLException If there was no such attribute assigned on this node,
-   *         or key is null
+   *           or key is null
    */
   public String removeAttribute(String key) throws XMLException {
     if (key == null || attributes.get(key) == null)
@@ -230,7 +233,7 @@ public class XMLNode {
    * @param key Attribute name
    * @return The old value
    * @throws XMLException If there was no such attribute assigned on this node,
-   *         or key is null
+   *           or key is null
    */
   public int removeIntAttribute(String key) throws XMLException {
     return Integer.parseInt(removeAttribute(key));
@@ -243,7 +246,7 @@ public class XMLNode {
    * @param key Attribute name
    * @return The old value
    * @throws XMLException If there was no such attribute assigned on this node,
-   *         or key is null
+   *           or key is null
    */
   public double removeDoubleAttribute(String key) throws XMLException {
     return Double.parseDouble(removeAttribute(key));
@@ -256,7 +259,7 @@ public class XMLNode {
    * @param key Attribute name
    * @return The old value
    * @throws XMLException If there was no such attribute assigned on this node,
-   *         or key is null
+   *           or key is null
    */
   public boolean removeBoolAttribute(String key) {
     return Boolean.parseBoolean(removeAttribute(key));
