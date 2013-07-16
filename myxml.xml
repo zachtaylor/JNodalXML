@@ -1,8 +1,0 @@
-< root n1prop2 = "n1prop2val" n1prop1 = "n1prop1val" >
-	< child1 n2prop2 = "n2prop2val" n2prop1 = "n2prop1val" >
-		< child3 >
-		  die off
-		< / child3 >
-	< / child1 >
-	< child2 n3prop1 = "n3prop1val" / >
-< / root >

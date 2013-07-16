@@ -6,37 +6,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class XMLParser {
-  public static List<XMLNode> parse(File f) throws FileNotFoundException {
-    return parse(new XMLTokenizer(f));
+public class XmlParser {
+  public static List<XmlNode> parse(File f) throws FileNotFoundException {
+    return parse(new XmlTokenizer(f));
   }
 
-  public static List<XMLNode> parse(String s) {
-    return parse(new XMLTokenizer(s));
+  public static List<XmlNode> parse(String s) {
+    return parse(new XmlTokenizer(s));
   }
 
-  public static List<XMLNode> parse(XMLTokenizer tokens) {
-    List<XMLNode> topLevel = new ArrayList<XMLNode>();
-    Stack<XMLNode> nodes = new Stack<XMLNode>();
+  public static List<XmlNode> parse(XmlTokenizer tokens) {
+    List<XmlNode> topLevel = new ArrayList<XmlNode>();
+    Stack<XmlNode> nodes = new Stack<XmlNode>();
 
-    XMLToken token;
+    XmlToken token;
 
     while (tokens.hasNext()) {
       token = tokens.next();
 
-      if (token.getType() == XMLTokenType.OPEN_BRACKET) {
+      if (token.getType() == XmlTokenType.OPEN_BRACKET) {
         token = tokens.next();
 
-        if (token.getType() == XMLTokenType.SLASH) {
+        if (token.getType() == XmlTokenType.SLASH) {
           token = tokens.next();
           if (!token.getValue().equals(nodes.peek().getName()))
             throw new RuntimeException(" uh oh ");
 
           token = tokens.next();
-          if (!(token.getType() == XMLTokenType.CLOSE_BRACKET))
+          if (!(token.getType() == XmlTokenType.CLOSE_BRACKET))
             throw new RuntimeException(" oh no ");
 
-          XMLNode node = nodes.pop();
+          XmlNode node = nodes.pop();
           if (nodes.isEmpty()) {
             topLevel.add(node);
           }
@@ -45,46 +45,46 @@ public class XMLParser {
           }
         }
         else {
-          nodes.push(new XMLNode(token.getValue()));
+          nodes.push(new XmlNode(token.getValue()));
 
           token = tokens.next();
-          while (token.getType() == XMLTokenType.TEXT) {
+          while (token.getType() == XmlTokenType.TEXT) {
             String attrName = token.getValue();
 
             token = tokens.next();
-            if (!(token.getType() == XMLTokenType.EQUALS))
+            if (!(token.getType() == XmlTokenType.EQUALS))
               throw new RuntimeException(" awkward ");
 
             token = tokens.next();
-            if (!(token.getType() == XMLTokenType.QUOTE))
+            if (!(token.getType() == XmlTokenType.QUOTE))
               throw new RuntimeException(" foo ");
 
             token = tokens.next();
-            if (!(token.getType() == XMLTokenType.TEXT))
+            if (!(token.getType() == XmlTokenType.TEXT))
               throw new RuntimeException(" bar ");
 
             String attrValue = token.getValue();
             token = tokens.next();
-            while (token.getType() == XMLTokenType.TEXT) {
+            while (token.getType() == XmlTokenType.TEXT) {
               attrValue = attrValue.concat(" ").concat(token.getValue());
               token = tokens.next();
             }
 
-            if (!(token.getType() == XMLTokenType.QUOTE))
+            if (!(token.getType() == XmlTokenType.QUOTE))
               throw new RuntimeException(" foo ");
 
             nodes.peek().setAttribute(attrName, attrValue);
             token = tokens.next();
           }
 
-          if (token.getType() == XMLTokenType.SLASH) {
+          if (token.getType() == XmlTokenType.SLASH) {
             nodes.peek().setSelfClosing(true);
 
             token = tokens.next();
-            if (!(token.getType() == XMLTokenType.CLOSE_BRACKET))
+            if (!(token.getType() == XmlTokenType.CLOSE_BRACKET))
               throw new RuntimeException(" bar ");
 
-            XMLNode node = nodes.pop();
+            XmlNode node = nodes.pop();
             if (nodes.isEmpty()) {
               topLevel.add(node);
             }
@@ -97,7 +97,7 @@ public class XMLParser {
       else {
         String val = token.getValue();
 
-        while (tokens.peek().getType() == XMLTokenType.TEXT) {
+        while (tokens.peek().getType() == XmlTokenType.TEXT) {
           val = val.concat(" ").concat(tokens.next().getValue());
         }
 

@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XMLNode {
+public class XmlNode {
   /**
    * Constructor for XMLNode
    * 
    * @param nodeName Name of the node
    */
-  public XMLNode(String nodeName) {
+  public XmlNode(String nodeName) {
     name = nodeName;
   }
 
@@ -31,9 +31,9 @@ public class XMLNode {
    * 
    * @return An unmodifiable collection of nodes
    */
-  public Collection<XMLNode> getAllChildren() {
+  public Collection<XmlNode> getAllChildren() {
     if (children == null)
-      return Collections.unmodifiableCollection(new ArrayList<XMLNode>());
+      return Collections.unmodifiableCollection(new ArrayList<XmlNode>());
 
     return Collections.unmodifiableCollection(children);
   }
@@ -44,13 +44,13 @@ public class XMLNode {
    * @param nodeName Name to search for among child nodes
    * @return A newly constructed list of child nodes with the specified name
    */
-  public List<XMLNode> getChildren(String nodeName) {
-    List<XMLNode> val = new ArrayList<XMLNode>();
+  public List<XmlNode> getChildren(String nodeName) {
+    List<XmlNode> val = new ArrayList<XmlNode>();
 
     if (children == null)
       return val;
 
-    for (XMLNode node : children) {
+    for (XmlNode node : children) {
       if (node.name.equals(nodeName))
         val.add(node);
     }
@@ -63,11 +63,11 @@ public class XMLNode {
    * 
    * @param childName Name of the child node to add
    * @return This node
-   * @throws XMLException If the child cannot be added, for instance if this
+   * @throws XmlException If the child cannot be added, for instance if this
    *           node is self-closing or has value
    */
-  public XMLNode addChild(String childName) throws XMLException {
-    return addChild(new XMLNode(childName));
+  public XmlNode addChild(String childName) throws XmlException {
+    return addChild(new XmlNode(childName));
   }
 
   /**
@@ -75,17 +75,17 @@ public class XMLNode {
    * 
    * @param n Child node to add
    * @return This node
-   * @throws XMLException If the child cannot be added, for instance if this
+   * @throws XmlException If the child cannot be added, for instance if this
    *           node is self-closing or has value
    */
-  public XMLNode addChild(XMLNode n) throws XMLException {
+  public XmlNode addChild(XmlNode n) throws XmlException {
     if (selfClosing)
-      throw new XMLException("Cannot add children to self-closing XMLNode");
+      throw new XmlException("Cannot add children to self-closing XMLNode");
     if (value != null)
-      throw new XMLException("Cannot add children to XMLNode with value");
+      throw new XmlException("Cannot add children to XMLNode with value");
 
     if (children == null) {
-      children = new ArrayList<XMLNode>();
+      children = new ArrayList<XmlNode>();
     }
 
     children.add(n);
@@ -161,12 +161,12 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key is null, value is null, or was previously
+   * @throws XmlException If the key is null, value is null, or was previously
    *           assigned to another value
    */
-  public XMLNode setAttribute(String key, String value) throws XMLException {
+  public XmlNode setAttribute(String key, String value) throws XmlException {
     if (key == null || value == null || attributes.get(key) != null)
-      throw new XMLException("Cannot reset attribute value");
+      throw new XmlException("Cannot reset attribute value");
 
     attributes.put(key, value);
     return this;
@@ -178,10 +178,10 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key is null, value is null, or was previously
+   * @throws XmlException If the key is null, value is null, or was previously
    *           assigned to another value
    */
-  public XMLNode setAttribute(String key, int value) throws XMLException {
+  public XmlNode setAttribute(String key, int value) throws XmlException {
     return setAttribute(key, Integer.toString(value));
   }
 
@@ -191,10 +191,10 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key is null, value is null, or was previously
+   * @throws XmlException If the key is null, value is null, or was previously
    *           assigned to another value
    */
-  public XMLNode setAttribute(String key, double value) throws XMLException {
+  public XmlNode setAttribute(String key, double value) throws XmlException {
     return setAttribute(key, Double.toString(value));
   }
 
@@ -204,10 +204,10 @@ public class XMLNode {
    * @param key Attribute name
    * @param value Attribute value
    * @return This node
-   * @throws XMLException If the key is null, value is null, or was previously
+   * @throws XmlException If the key is null, value is null, or was previously
    *           assigned to another value
    */
-  public XMLNode setAttribute(String key, boolean value) throws XMLException {
+  public XmlNode setAttribute(String key, boolean value) throws XmlException {
     return setAttribute(key, Boolean.toString(value));
   }
 
@@ -216,12 +216,12 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node,
+   * @throws XmlException If there was no such attribute assigned on this node,
    *           or key is null
    */
-  public String removeAttribute(String key) throws XMLException {
+  public String removeAttribute(String key) throws XmlException {
     if (key == null || attributes.get(key) == null)
-      throw new XMLException("Attribute does not exist");
+      throw new XmlException("Attribute does not exist");
 
     return attributes.remove(key);
   }
@@ -232,10 +232,10 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node,
+   * @throws XmlException If there was no such attribute assigned on this node,
    *           or key is null
    */
-  public int removeIntAttribute(String key) throws XMLException {
+  public int removeIntAttribute(String key) throws XmlException {
     return Integer.parseInt(removeAttribute(key));
   }
 
@@ -245,10 +245,10 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node,
+   * @throws XmlException If there was no such attribute assigned on this node,
    *           or key is null
    */
-  public double removeDoubleAttribute(String key) throws XMLException {
+  public double removeDoubleAttribute(String key) throws XmlException {
     return Double.parseDouble(removeAttribute(key));
   }
 
@@ -258,7 +258,7 @@ public class XMLNode {
    * 
    * @param key Attribute name
    * @return The old value
-   * @throws XMLException If there was no such attribute assigned on this node,
+   * @throws XmlException If there was no such attribute assigned on this node,
    *           or key is null
    */
   public boolean removeBoolAttribute(String key) {
@@ -270,13 +270,13 @@ public class XMLNode {
    * 
    * @param b Whether the node should be self-closing
    * @return This node
-   * @throws XMLException If this node has children, or a value, and b is true
+   * @throws XmlException If this node has children, or a value, and b is true
    */
-  public XMLNode setSelfClosing(boolean b) throws XMLException {
+  public XmlNode setSelfClosing(boolean b) throws XmlException {
     if (children != null && b)
-      throw new XMLException("Cannot set self closing of XMLNode with children");
+      throw new XmlException("Cannot set self closing of XMLNode with children");
     if (value != null && b)
-      throw new XMLException("Cannot set self closing of XMLNode with value");
+      throw new XmlException("Cannot set self closing of XMLNode with value");
 
     selfClosing = b;
     return this;
@@ -305,13 +305,13 @@ public class XMLNode {
    * 
    * @param s Value to set
    * @return This node
-   * @throws XMLException If this node is self-closing or has children
+   * @throws XmlException If this node is self-closing or has children
    */
-  public XMLNode setValue(String s) throws XMLException {
+  public XmlNode setValue(String s) throws XmlException {
     if (selfClosing)
-      throw new XMLException("Cannot set value of self closing XMLNode");
+      throw new XmlException("Cannot set value of self closing XMLNode");
     if (children != null)
-      throw new XMLException("Cannot set value of XMLNode which has children");
+      throw new XmlException("Cannot set value of XMLNode which has children");
 
     value = s;
     return this;
@@ -344,7 +344,7 @@ public class XMLNode {
     else if (children != null) {
       sb.append(">\n");
 
-      for (XMLNode node : children) {
+      for (XmlNode node : children) {
         sb.append(node.doToString(depth + 1));
       }
 
@@ -372,10 +372,10 @@ public class XMLNode {
   }
 
   public boolean equals(Object o) {
-    if (!(o instanceof XMLNode))
+    if (!(o instanceof XmlNode))
       return false;
 
-    XMLNode node = (XMLNode) o;
+    XmlNode node = (XmlNode) o;
 
     if (!name.equals(node.name))
       return false;
@@ -399,6 +399,6 @@ public class XMLNode {
 
   private String name, value = null;
   private boolean selfClosing = false;
-  private List<XMLNode> children = null;
+  private List<XmlNode> children = null;
   private Map<String, String> attributes = new HashMap<String, String>();
 }

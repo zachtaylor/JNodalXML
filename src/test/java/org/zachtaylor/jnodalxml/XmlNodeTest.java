@@ -6,13 +6,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class XMLNodeTest extends TestCase {
-  static XMLNode node;
+public class XmlNodeTest extends TestCase {
+  static XmlNode node;
 
   static String NODE_NAME = "name";
 
   public void setUp() throws Exception {
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
   }
 
   public void testName() {
@@ -26,7 +26,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testValueEquals() {
-    XMLNode other = new XMLNode(NODE_NAME);
+    XmlNode other = new XmlNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -37,7 +37,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testValueNotEquals() {
-    XMLNode other = new XMLNode(NODE_NAME);
+    XmlNode other = new XmlNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -45,7 +45,7 @@ public class XMLNodeTest extends TestCase {
 
     assertTrue(!other.equals(node));
 
-    other = new XMLNode(NODE_NAME);
+    other = new XmlNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -72,7 +72,7 @@ public class XMLNodeTest extends TestCase {
     try {
       node.removeAttribute("key1");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
   }
 
@@ -97,19 +97,19 @@ public class XMLNodeTest extends TestCase {
     try {
       node.setAttribute(null, "value");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
 
     try {
       node.setAttribute("key", null);
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
 
     try {
       node.removeAttribute("key");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
   }
 
@@ -119,7 +119,7 @@ public class XMLNodeTest extends TestCase {
     try {
       node.setAttribute("key", "newValue");
       fail("Should not allow reset of key \"key\"");
-    } catch (XMLException e) {
+    } catch (XmlException e) {
     }
   }
 
@@ -165,7 +165,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testAttributeEquals() {
-    XMLNode other = new XMLNode(NODE_NAME);
+    XmlNode other = new XmlNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -176,7 +176,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testAttributeNotEquals() {
-    XMLNode other = new XMLNode(NODE_NAME);
+    XmlNode other = new XmlNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -184,7 +184,7 @@ public class XMLNodeTest extends TestCase {
 
     assertFalse(other.equals(node));
 
-    other = new XMLNode(NODE_NAME);
+    other = new XmlNode(NODE_NAME);
 
     assertEquals(other, node);
 
@@ -194,7 +194,7 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testChild() {
-    XMLNode child = new XMLNode("child");
+    XmlNode child = new XmlNode("child");
 
     node.addChild(child);
 
@@ -202,8 +202,8 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testChildren() {
-    XMLNode child1 = new XMLNode("child1");
-    XMLNode child2 = new XMLNode("child2");
+    XmlNode child1 = new XmlNode("child1");
+    XmlNode child2 = new XmlNode("child2");
 
     node.addChild(child1).addChild(child2);
 
@@ -212,17 +212,17 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testTwins() {
-    List<XMLNode> nodes = new ArrayList<XMLNode>();
+    List<XmlNode> nodes = new ArrayList<XmlNode>();
 
-    nodes.add(new XMLNode("child"));
-    nodes.add(new XMLNode("child"));
-    nodes.add(new XMLNode("child"));
+    nodes.add(new XmlNode("child"));
+    nodes.add(new XmlNode("child"));
+    nodes.add(new XmlNode("child"));
 
-    for (XMLNode current_node : nodes) {
+    for (XmlNode current_node : nodes) {
       node.addChild(current_node);
     }
 
-    List<XMLNode> children = node.getChildren("child");
+    List<XmlNode> children = node.getChildren("child");
 
     assertEquals(nodes.size(), children.size());
     assertTrue(children.containsAll(nodes));
@@ -233,68 +233,68 @@ public class XMLNodeTest extends TestCase {
   }
 
   public void testGetAllChildren() {
-    List<XMLNode> nodes = new ArrayList<XMLNode>();
+    List<XmlNode> nodes = new ArrayList<XmlNode>();
 
-    nodes.add(new XMLNode("foo"));
-    nodes.add(new XMLNode("bar"));
-    nodes.add(new XMLNode("baz"));
+    nodes.add(new XmlNode("foo"));
+    nodes.add(new XmlNode("bar"));
+    nodes.add(new XmlNode("baz"));
 
-    for (XMLNode current_node : nodes) {
+    for (XmlNode current_node : nodes) {
       node.addChild(current_node);
     }
 
-    Collection<XMLNode> children = node.getAllChildren();
+    Collection<XmlNode> children = node.getAllChildren();
 
     assertEquals(nodes.size(), children.size());
     assertTrue(children.containsAll(nodes));
   }
 
   public void testSetValueConflicts() {
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
     node.setSelfClosing(true);
 
     try {
       node.setValue("value");
       fail("This should die");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
 
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
     node.addChild("foo");
 
     try {
       node.setValue("value");
       fail("This should die");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
   }
 
   public void testAddChildrenConflicts() {
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
     node.setSelfClosing(true);
 
     try {
       node.addChild("child");
       fail("This should die");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
 
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
     node.setValue("foo");
 
     try {
       node.addChild("child");
       fail("This should die");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
   }
 
   public void testSetSelfClosingConflicts() {
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
     node.addChild("foo");
 
     // In a way, assert no exception
@@ -304,10 +304,10 @@ public class XMLNodeTest extends TestCase {
       node.setSelfClosing(true);
       fail("This should die");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
 
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
     node.setValue("foo");
 
     // In a way, assert no exception
@@ -317,10 +317,10 @@ public class XMLNodeTest extends TestCase {
       node.setSelfClosing(true);
       fail("This should die");
     } catch (Exception e) {
-      assertTrue(e instanceof XMLException);
+      assertTrue(e instanceof XmlException);
     }
 
-    node = new XMLNode(NODE_NAME);
+    node = new XmlNode(NODE_NAME);
 
     node.setSelfClosing(true);
 

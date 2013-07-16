@@ -1,8 +1,38 @@
-*.class
+##########################
+# What git should ignore #
+##########################
 
-# Package Files #
-*.war
-*.ear
+# Compiled files #
+##################
+dependency-reduced-pom.xml
+target
+site
+bin
 
-# Custom ignore for bin folder
-bin/
+# Documentation files #
+#######################
+docs/build
+docs/cache
+
+# Sublime files #
+#################
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse files #
+#################
+.project
+.classpath
+*.prefs
+
+# Intellij files #
+##################
+.idea
+*.iml
+
+# Misc #
+########
+.DS_Store
+*.TODO
+parser
+backup

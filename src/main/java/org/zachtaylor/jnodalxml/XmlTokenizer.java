@@ -7,14 +7,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class XMLTokenizer {
-  public XMLTokenizer(File f) throws FileNotFoundException {
+public class XmlTokenizer {
+  public XmlTokenizer(File f) throws FileNotFoundException {
     Scanner scan = new Scanner(new FileReader(f));
     parse(scan);
     scan.close();
   }
 
-  public XMLTokenizer(String s) {
+  public XmlTokenizer(String s) {
     Scanner scan = new Scanner(s);
     parse(scan);
     scan.close();
@@ -24,11 +24,11 @@ public class XMLTokenizer {
     return !tokens.isEmpty();
   }
 
-  public XMLToken next() {
+  public XmlToken next() {
     return tokens.remove();
   }
 
-  public XMLToken peek() {
+  public XmlToken peek() {
     return tokens.peek();
   }
 
@@ -45,15 +45,15 @@ public class XMLTokenizer {
         int qChar = string.indexOf('"');
 
         if (qChar < 0) {
-          add(new XMLToken(XMLTokenType.TEXT, string));
+          add(new XmlToken(XmlTokenType.TEXT, string));
           string = "";
         }
         else {
           if (qChar > 0) {
-            add(new XMLToken(XMLTokenType.TEXT, string.substring(0, qChar)));
+            add(new XmlToken(XmlTokenType.TEXT, string.substring(0, qChar)));
             string = string.substring(qChar);
           }
-          add(new XMLToken(XMLTokenType.QUOTE));
+          add(new XmlToken(XmlTokenType.QUOTE));
           string = string.substring(1);
           inQuotes = false;
         }
@@ -66,25 +66,26 @@ public class XMLTokenizer {
         int endChar = string.indexOf("-->");
         while (endChar == -1) {
           string = string.concat(" ").concat(scan.next());
+          endChar = string.indexOf("-->");
         }
         string = string.substring(endChar + 3);
       }
       else if (inBrackets) {
         if (string.startsWith("\"")) {
-          add(new XMLToken(XMLTokenType.QUOTE));
+          add(new XmlToken(XmlTokenType.QUOTE));
           string = string.substring(1);
           inQuotes = true;
         }
         else if (string.startsWith("/")) {
-          add(new XMLToken(XMLTokenType.SLASH));
+          add(new XmlToken(XmlTokenType.SLASH));
           string = string.substring(1);
         }
         else if (string.startsWith("=")) {
-          add(new XMLToken(XMLTokenType.EQUALS));
+          add(new XmlToken(XmlTokenType.EQUALS));
           string = string.substring(1);
         }
         else if (string.startsWith(">")) {
-          add(new XMLToken(XMLTokenType.CLOSE_BRACKET));
+          add(new XmlToken(XmlTokenType.CLOSE_BRACKET));
           string = string.substring(1);
           inBrackets = false;
         }
@@ -92,17 +93,17 @@ public class XMLTokenizer {
           int sChar = specialCharacterIndex(string);
 
           if (sChar < 0) {
-            add(new XMLToken(XMLTokenType.TEXT, string));
+            add(new XmlToken(XmlTokenType.TEXT, string));
             string = "";
           }
           else if (sChar > 0) {
-            add(new XMLToken(XMLTokenType.TEXT, string.substring(0, sChar)));
+            add(new XmlToken(XmlTokenType.TEXT, string.substring(0, sChar)));
             string = string.substring(sChar);
           }
         }
       }
       else if (string.startsWith("<")) {
-        add(new XMLToken(XMLTokenType.OPEN_BRACKET));
+        add(new XmlToken(XmlTokenType.OPEN_BRACKET));
         string = string.substring(1);
         inBrackets = true;
       }
@@ -110,18 +111,18 @@ public class XMLTokenizer {
         int sChar = string.indexOf('<');
 
         if (sChar < 0) {
-          add(new XMLToken(XMLTokenType.TEXT, string));
+          add(new XmlToken(XmlTokenType.TEXT, string));
           string = "";
         }
         else if (sChar > 0) {
-          add(new XMLToken(XMLTokenType.TEXT, string.substring(0, sChar)));
+          add(new XmlToken(XmlTokenType.TEXT, string.substring(0, sChar)));
           string = string.substring(sChar);
         }
       }
     }
   }
 
-  private void add(XMLToken token) {
+  private void add(XmlToken token) {
     tokens.add(token);
   }
 
@@ -140,5 +141,5 @@ public class XMLTokenizer {
     return lowestIndex;
   }
 
-  private Queue<XMLToken> tokens = new LinkedList<XMLToken>();
+  private Queue<XmlToken> tokens = new LinkedList<XmlToken>();
 }

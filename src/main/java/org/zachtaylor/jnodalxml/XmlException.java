@@ -1,7 +1,7 @@
 package org.zachtaylor.jnodalxml;
 
-public class XMLException extends RuntimeException {
-  public XMLException(String message) {
+public class XmlException extends RuntimeException {
+  public XmlException(String message) {
     super(message);
   }
 
