@@ -27,6 +27,17 @@ public class XmlNode {
 	}
 
 	/**
+	 * Setter for name of the XmlNode
+	 * 
+	 * @param nodeName Name of the XmlNode
+	 * @return This XmlNode
+	 */
+	public XmlNode setName(String nodeName) {
+		name = nodeName;
+		return this;
+	}
+
+	/**
 	 * Getter for all of the children
 	 * 
 	 * @return An unmodifiable collection of nodes
