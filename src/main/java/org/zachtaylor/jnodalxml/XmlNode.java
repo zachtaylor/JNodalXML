@@ -110,7 +110,9 @@ public class XmlNode {
 	 * @return This XmlNode
 	 */
 	public XmlNode addAll(Collection<XmlNode> nodes) {
-		children.addAll(nodes);
+		for (XmlNode node : nodes) {
+			addChild(node);
+		}
 
 		return this;
 	}
@@ -387,7 +389,7 @@ public class XmlNode {
 	}
 
 	public String toString() {
-		String value = "<" + getName() + " ";
+		String value = "<" + getName();
 
 		if (!attributes.isEmpty()) {
 			value += "( ";
@@ -397,7 +399,7 @@ public class XmlNode {
 			value += ") ";
 		}
 		if (selfClosing) {
-			value += "/";
+			value += " /";
 		}
 
 		return value + ">";
@@ -436,7 +438,7 @@ public class XmlNode {
 
 			sb.append("</");
 			sb.append(name);
-			sb.append(">\n");
+			sb.append(">");
 		}
 		else {
 			sb.append("> ");
