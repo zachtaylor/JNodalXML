@@ -46,10 +46,18 @@ public class XmlParser {
         }
         else {
           nodes.push(new XmlNode(token.getValue()));
-
           token = tokens.next();
+
           while (token.getType() == XmlTokenType.TEXT) {
             String attrName = token.getValue();
+
+            if (nodes.peek().getName().startsWith("?")) {
+              do {
+                token = tokens.next();
+              } while (token.getType() != XmlTokenType.TEXT || !token.getValue().equals("?"));
+              token = new XmlToken(XmlTokenType.SLASH);
+              break;
+            }
 
             token = tokens.next();
             if (!(token.getType() == XmlTokenType.EQUALS))

@@ -423,7 +423,7 @@ public class XmlNode {
 		}
 
 		if (isSelfClosing()) {
-			sb.append(" />\n");
+			sb.append(" />");
 		}
 		else if (children != null) {
 			sb.append(">\n");
