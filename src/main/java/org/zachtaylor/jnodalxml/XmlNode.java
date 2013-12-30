@@ -217,7 +217,7 @@ public class XmlNode {
    * @param key Attribute name
    * @return Value assigned to the attribute name. Null if attribute has not been set
    */
-  public String getAttribute(String key) {
+  public XmlAttribute getAttribute(String key) {
     return attributes.get(key);
   }
 
@@ -231,48 +231,19 @@ public class XmlNode {
   }
 
   /**
-   * Gets an attribute of this node, and calls Integer.parseInt for convenience
-   * 
-   * @param key Attribute name
-   * @return Value assigned to the attribute name as Integer
-   */
-  public int getIntAttribute(String key) {
-    return Integer.parseInt(getAttribute(key));
-  }
-
-  /**
-   * Gets an attribute of this node, and calls Double.parseDouble for convenience
-   * 
-   * @param key Attribute name
-   * @return Value assigned to the attribute name as Double
-   */
-  public double getDoubleAttribute(String key) {
-    return Double.parseDouble(getAttribute(key));
-  }
-
-  /**
-   * Gets an attribute of this node, and calls Boolean.parseBoolean for convenience
-   * 
-   * @param key Attribute name
-   * @return Value assigned to the attribute name as Boolean
-   */
-  public boolean getBoolAttribute(String key) {
-    return Boolean.parseBoolean(getAttribute(key));
-  }
-
-  /**
    * Adds a new attribute to this node
    * 
-   * @param key Attribute name
-   * @param value Attribute value
+   * @param attribute The XmlAttribute to add
    * @return This node
-   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   * @throws XmlException If the attribute key has already been assigned on this node
    */
-  public XmlNode setAttribute(String key, String value) throws XmlException {
-    if (key == null || value == null || attributes.get(key) != null)
+  public XmlNode addAttribute(XmlAttribute attribute) throws XmlException {
+    if (attributes.containsKey(attribute.getKey())) {
       throw new XmlException("Cannot reset attribute value");
+    }
 
-    attributes.put(key, value);
+    attributes.put(attribute.getKey(), attribute);
+
     return this;
   }
 
@@ -284,8 +255,12 @@ public class XmlNode {
    * @return This node
    * @throws XmlException If the key is null, value is null, or was previously assigned to another value
    */
-  public XmlNode setAttribute(String key, int value) throws XmlException {
-    return setAttribute(key, Integer.toString(value));
+  public XmlNode addAttribute(String key, String value) throws XmlException {
+    if (key == null || value == null) {
+      throw new XmlException("Cannot have null key or value");
+    }
+
+    return addAttribute(new XmlAttribute(key, value));
   }
 
   /**
@@ -296,8 +271,8 @@ public class XmlNode {
    * @return This node
    * @throws XmlException If the key is null, value is null, or was previously assigned to another value
    */
-  public XmlNode setAttribute(String key, double value) throws XmlException {
-    return setAttribute(key, Double.toString(value));
+  public XmlNode addAttribute(String key, int value) throws XmlException {
+    return addAttribute(key, Integer.toString(value));
   }
 
   /**
@@ -308,8 +283,20 @@ public class XmlNode {
    * @return This node
    * @throws XmlException If the key is null, value is null, or was previously assigned to another value
    */
-  public XmlNode setAttribute(String key, boolean value) throws XmlException {
-    return setAttribute(key, Boolean.toString(value));
+  public XmlNode addAttribute(String key, double value) throws XmlException {
+    return addAttribute(key, Double.toString(value));
+  }
+
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   */
+  public XmlNode addAttribute(String key, boolean value) throws XmlException {
+    return addAttribute(key, Boolean.toString(value));
   }
 
   /**
@@ -319,44 +306,11 @@ public class XmlNode {
    * @return The old value
    * @throws XmlException If there was no such attribute assigned on this node, or key is null
    */
-  public String removeAttribute(String key) throws XmlException {
+  public XmlAttribute removeAttribute(String key) throws XmlException {
     if (key == null || attributes.get(key) == null)
       throw new XmlException("Attribute does not exist");
 
     return attributes.remove(key);
-  }
-
-  /**
-   * Removes an attribute from this node, and calls Integer.parseInt on the old value for convenience
-   * 
-   * @param key Attribute name
-   * @return The old value
-   * @throws XmlException If there was no such attribute assigned on this node, or key is null
-   */
-  public int removeIntAttribute(String key) throws XmlException {
-    return Integer.parseInt(removeAttribute(key));
-  }
-
-  /**
-   * Removes an attribute from this node, and calls Double.parseDouble on the old value for convenience
-   * 
-   * @param key Attribute name
-   * @return The old value
-   * @throws XmlException If there was no such attribute assigned on this node, or key is null
-   */
-  public double removeDoubleAttribute(String key) throws XmlException {
-    return Double.parseDouble(removeAttribute(key));
-  }
-
-  /**
-   * Removes an attribute from this node, and calls Boolean.parseBoolean on the old value for convenience
-   * 
-   * @param key Attribute name
-   * @return The old value
-   * @throws XmlException If there was no such attribute assigned on this node, or key is null
-   */
-  public boolean removeBoolAttribute(String key) {
-    return Boolean.parseBoolean(removeAttribute(key));
   }
 
   /**
@@ -365,7 +319,7 @@ public class XmlNode {
    * @return This XmlNode
    */
   public XmlNode clearAttributes() {
-    attributes = new HashMap<String, String>();
+    attributes = new HashMap<String, XmlAttribute>();
     return this;
   }
 
@@ -426,8 +380,8 @@ public class XmlNode {
 
     if (!attributes.isEmpty()) {
       value += "( ";
-      for (Map.Entry<String, String> attributePair : attributes.entrySet()) {
-        value += attributePair.getKey() + " ";
+      for (XmlAttribute attribute : attributes.values()) {
+        value += attribute.getKey() + " ";
       }
       value += ") ";
     }
@@ -447,12 +401,8 @@ public class XmlNode {
     sb.append("<");
     sb.append(name);
 
-    for (Map.Entry<String, String> entry : attributes.entrySet()) {
-      sb.append(" ");
-      sb.append(entry.getKey());
-      sb.append("=\"");
-      sb.append(entry.getValue());
-      sb.append("\"");
+    for (XmlAttribute attribute : attributes.values()) {
+      sb.append(String.format(" %s=\"%s\"", attribute.getKey(), attribute.getValue()));
     }
 
     if (isSelfClosing()) {
@@ -519,5 +469,5 @@ public class XmlNode {
   private boolean selfClosing = false;
   private List<XmlNode> children = null;
   private XmlNode parent = null;
-  private Map<String, String> attributes = new HashMap<String, String>();
+  private Map<String, XmlAttribute> attributes = new HashMap<String, XmlAttribute>();
 }

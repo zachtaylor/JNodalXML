@@ -56,13 +56,15 @@ public class XmlNodeTest extends TestCase {
   }
 
   public void testAttribute() {
-    node.setAttribute("key", "value");
+    node.addAttribute("key", "value");
 
-    assertEquals("value", node.getAttribute("key"));
+    XmlAttribute attr = new XmlAttribute("key", "value");
+
+    assertEquals(attr, node.getAttribute("key"));
   }
 
   public void testAttributeHasAndRemove() {
-    node.setAttribute("key1", "val1");
+    node.addAttribute("key1", "val1");
 
     assertTrue(node.hasAttribute("key1"));
 
@@ -85,7 +87,7 @@ public class XmlNodeTest extends TestCase {
     keys.add("key3");
 
     for (String key : keys) {
-      node.setAttribute(key, "value");
+      node.addAttribute(key, "value");
     }
 
     Collection<String> attributeKeys = node.attributeKeys();
@@ -96,13 +98,13 @@ public class XmlNodeTest extends TestCase {
 
   public void testAttributeNulls() {
     try {
-      node.setAttribute(null, "value");
+      node.addAttribute(null, "value");
     } catch (Exception e) {
       assertTrue(e instanceof XmlException);
     }
 
     try {
-      node.setAttribute("key", null);
+      node.addAttribute("key", null);
     } catch (Exception e) {
       assertTrue(e instanceof XmlException);
     }
@@ -115,10 +117,10 @@ public class XmlNodeTest extends TestCase {
   }
 
   public void testCannotResetAttribute() {
-    node.setAttribute("key", "value");
+    node.addAttribute("key", "value");
 
     try {
-      node.setAttribute("key", "newValue");
+      node.addAttribute("key", "newValue");
       fail("Should not allow reset of key \"key\"");
     } catch (XmlException e) {
     }
@@ -130,39 +132,49 @@ public class XmlNodeTest extends TestCase {
     boolean my_boolean = true;
 
     // int
-    node.setAttribute("int", my_int);
-    assertEquals(my_int, node.getIntAttribute("int"));
-    node.removeAttribute("int");
-    node.setAttribute("int", my_int + "");
-    assertEquals(my_int, node.getIntAttribute("int"));
-    assertEquals(my_int, node.removeIntAttribute("int"));
+    node.addAttribute("int", my_int);
+    XmlAttribute intAttr = node.getAttribute("int");
+    assertEquals(my_int, intAttr.getIntValue());
+    assertEquals(intAttr, node.removeAttribute("int"));
+    node.addAttribute("int", my_int + "");
+    XmlAttribute intAttrFromString = node.getAttribute("int");
+    assertEquals(my_int, intAttrFromString.getIntValue());
+    assertEquals(intAttrFromString, node.removeAttribute("int"));
     assertTrue(!node.hasAttribute("int"));
 
     // double
-    node.setAttribute("double", my_double);
-    assertEquals(my_double, node.getDoubleAttribute("double"));
-    node.removeAttribute("double");
-    node.setAttribute("double", my_double + "");
-    assertEquals(my_double, node.getDoubleAttribute("double"));
-    assertEquals(my_double, node.removeDoubleAttribute("double"));
+    node.addAttribute("double", my_double);
+    XmlAttribute doubleAttr = node.getAttribute("double");
+    assertEquals(my_double, doubleAttr.getDoubleValue());
+    assertEquals(doubleAttr, node.removeAttribute("double"));
+    node.addAttribute("double", my_double + "");
+    XmlAttribute doubleAttrFromString = node.getAttribute("double");
+    assertEquals(my_double, doubleAttrFromString.getDoubleValue());
+    assertEquals(doubleAttrFromString, node.removeAttribute("double"));
     assertTrue(!node.hasAttribute("double"));
 
     // boolean
-    node.setAttribute("boolean", my_boolean);
-    assertEquals(my_boolean, node.getBoolAttribute("boolean"));
-    node.removeAttribute("boolean");
-    node.setAttribute("boolean", my_boolean + "");
-    assertEquals(my_boolean, node.getBoolAttribute("boolean"));
-    assertEquals(my_boolean, node.removeBoolAttribute("boolean"));
+    node.addAttribute("boolean", my_boolean);
+    XmlAttribute booleanAttr = node.getAttribute("boolean");
+    assertEquals(my_boolean, booleanAttr.getBoolValue());
+    assertEquals(booleanAttr, node.removeAttribute("boolean"));
+    node.addAttribute("boolean", my_boolean + "");
+    XmlAttribute booleanAttrFromString = node.getAttribute("boolean");
+    assertEquals(my_boolean, booleanAttrFromString.getBoolValue());
+    assertEquals(booleanAttrFromString, node.removeAttribute("boolean"));
     assertTrue(!node.hasAttribute("boolean"));
   }
 
   public void testMultipleAttributes() {
-    node.setAttribute("key1", "value1").setAttribute("key2", "value2").setAttribute("key3", "value3");
+    node.addAttribute("key1", "value1").addAttribute("key2", "value2").addAttribute("key3", "value3");
 
-    assertEquals("value1", node.getAttribute("key1"));
-    assertEquals("value2", node.getAttribute("key2"));
-    assertEquals("value3", node.getAttribute("key3"));
+    XmlAttribute attr1 = new XmlAttribute("key1", "value1");
+    XmlAttribute attr2 = new XmlAttribute("key2", "value2");
+    XmlAttribute attr3 = new XmlAttribute("key3", "value3");
+
+    assertEquals(attr1, node.getAttribute("key1"));
+    assertEquals(attr2, node.getAttribute("key2"));
+    assertEquals(attr3, node.getAttribute("key3"));
   }
 
   public void testAttributeEquals() {
@@ -170,8 +182,8 @@ public class XmlNodeTest extends TestCase {
 
     assertEquals(other, node);
 
-    node.setAttribute("key", "value");
-    other.setAttribute("key", "value");
+    node.addAttribute("key", "value");
+    other.addAttribute("key", "value");
 
     assertEquals(other, node);
   }
@@ -181,7 +193,7 @@ public class XmlNodeTest extends TestCase {
 
     assertEquals(other, node);
 
-    other.setAttribute("key", "value");
+    other.addAttribute("key", "value");
 
     assertFalse(other.equals(node));
 
@@ -189,7 +201,7 @@ public class XmlNodeTest extends TestCase {
 
     assertEquals(other, node);
 
-    node.setAttribute("key", "value");
+    node.addAttribute("key", "value");
 
     assertFalse(other.equals(node));
   }
