@@ -233,23 +233,16 @@ public class XmlNode {
   /**
    * Adds a new attribute to this node
    * 
-   * @param key Attribute name
-   * @param value Attribute value
+   * @param attribute The XmlAttribute to add
    * @return This node
-   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   * @throws XmlException If the attribute key has already been assigned on this node
    */
-  public XmlNode setAttribute(String key, String value) throws XmlException {
-    if (key == null || value == null) {
-      throw new XmlException("Cannot have null key or value");
-    }
-
-    XmlAttribute attribute = getAttribute(key);
-
-    if (attribute != null) {
+  public XmlNode addAttribute(XmlAttribute attribute) throws XmlException {
+    if (attributes.containsKey(attribute.getKey())) {
       throw new XmlException("Cannot reset attribute value");
     }
 
-    attributes.put(key, new XmlAttribute(key, value));
+    attributes.put(attribute.getKey(), attribute);
 
     return this;
   }
@@ -262,8 +255,12 @@ public class XmlNode {
    * @return This node
    * @throws XmlException If the key is null, value is null, or was previously assigned to another value
    */
-  public XmlNode setAttribute(String key, int value) throws XmlException {
-    return setAttribute(key, Integer.toString(value));
+  public XmlNode addAttribute(String key, String value) throws XmlException {
+    if (key == null || value == null) {
+      throw new XmlException("Cannot have null key or value");
+    }
+
+    return addAttribute(new XmlAttribute(key, value));
   }
 
   /**
@@ -274,8 +271,8 @@ public class XmlNode {
    * @return This node
    * @throws XmlException If the key is null, value is null, or was previously assigned to another value
    */
-  public XmlNode setAttribute(String key, double value) throws XmlException {
-    return setAttribute(key, Double.toString(value));
+  public XmlNode addAttribute(String key, int value) throws XmlException {
+    return addAttribute(key, Integer.toString(value));
   }
 
   /**
@@ -286,8 +283,20 @@ public class XmlNode {
    * @return This node
    * @throws XmlException If the key is null, value is null, or was previously assigned to another value
    */
-  public XmlNode setAttribute(String key, boolean value) throws XmlException {
-    return setAttribute(key, Boolean.toString(value));
+  public XmlNode addAttribute(String key, double value) throws XmlException {
+    return addAttribute(key, Double.toString(value));
+  }
+
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   */
+  public XmlNode addAttribute(String key, boolean value) throws XmlException {
+    return addAttribute(key, Boolean.toString(value));
   }
 
   /**

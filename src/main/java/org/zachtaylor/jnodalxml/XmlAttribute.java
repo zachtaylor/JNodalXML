@@ -21,27 +21,11 @@ public class XmlAttribute {
   }
 
   /**
-   * Sets the XmlAttribute Key
-   * @param keyString The Key
-   */
-  public void setKey(String keyString) {
-    key = keyString;
-  }
-
-  /**
    * Retrieves the XmlAttribute Value
    * @return The Value
    */
   public String getValue() {
     return value;
-  }
-
-  /**
-   * Sets the XmlAttribute Value
-   * @param valueString The Value
-   */
-  public void setValue(String valueString) {
-    value = valueString;
   }
 
   /**
@@ -81,6 +65,6 @@ public class XmlAttribute {
     return attribute.key.equals(key) && attribute.value.equals(value);
   }
 
-  private String key = null;
-  private String value = null;
+  private final String key;
+  private final String value;
 }
