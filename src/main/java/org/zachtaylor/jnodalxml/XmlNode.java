@@ -8,482 +8,516 @@ import java.util.List;
 import java.util.Map;
 
 public class XmlNode {
-	/**
-	 * Constructor for XMLNode
-	 * 
-	 * @param nodeName Name of the node
-	 */
-	public XmlNode(String nodeName) {
-		name = nodeName;
-	}
+  /**
+   * Constructor for XMLNode
+   * 
+   * @param nodeName Name of the node
+   */
+  public XmlNode(String nodeName) {
+    name = nodeName;
+  }
 
-	/**
-	 * Getter for name of the node
-	 * 
-	 * @return The tag name
-	 */
-	public String getName() {
-		return name;
-	}
+  /**
+   * Constructor for XMLNode
+   * 
+   * @param nodeName Name of the node
+   * @param parentNode Parent XmlNode
+   */
+  public XmlNode(String nodeName, XmlNode parentNode) {
+    this(nodeName);
 
-	/**
-	 * Setter for name of the XmlNode
-	 * 
-	 * @param nodeName Name of the XmlNode
-	 * @return This XmlNode
-	 */
-	public XmlNode setName(String nodeName) {
-		name = nodeName;
-		return this;
-	}
+    parentNode.addChild(this);
+  }
 
-	/**
-	 * Getter for all of the children
-	 * 
-	 * @return An unmodifiable collection of nodes
-	 */
-	public Collection<XmlNode> getAllChildren() {
-		if (children == null)
-			return Collections.unmodifiableCollection(new ArrayList<XmlNode>());
+  /**
+   * Getter for name of the node
+   * 
+   * @return The tag name
+   */
+  public String getName() {
+    return name;
+  }
 
-		return Collections.unmodifiableCollection(children);
-	}
+  /**
+   * Setter for name of the XmlNode
+   * 
+   * @param nodeName Name of the XmlNode
+   * @return This XmlNode
+   */
+  public XmlNode setName(String nodeName) {
+    name = nodeName;
+    return this;
+  }
 
-	/**
-	 * Getter for children with the specified name
-	 * 
-	 * @param nodeName Name to search for among child nodes
-	 * @return A newly constructed list of child nodes with the specified name
-	 */
-	public List<XmlNode> getChildren(String nodeName) {
-		List<XmlNode> val = new ArrayList<XmlNode>();
+  /**
+   * Getter for parent node
+   * 
+   * @return The parent of this XmlNode
+   */
+  public XmlNode getParent() {
+    return parent;
+  }
 
-		if (children == null)
-			return val;
+  /**
+   * Setter for parent node. For nodes that already had a parent,
+   * this node will additionally be removed from that parent.
+   * 
+   * @param parentNode The parent XmlNode
+   * @return This XmlNode
+   * @throws XmlException If the parent cannot have a child, for instance if this parent is self-closing or has value
+   */
+  public XmlNode setParent(XmlNode parentNode) throws XmlException {
+    if (parent != null) {
+      parent.removeChild(this);
+    }
 
-		for (XmlNode node : children) {
-			if (node.name.equals(nodeName))
-				val.add(node);
-		}
+    if (parentNode != null) {
+      parentNode.addChild(this);
+    }
 
-		return val;
-	}
+    return this;
+  }
 
-	/**
-	 * Shorthand for {@link #addChild(XmlNode)}
-	 * 
-	 * @param childName Name of the child node to add
-	 * @return This node
-	 * @throws XmlException If the child cannot be added, for instance if this
-	 *           node is self-closing or has value
-	 */
-	public XmlNode addChild(String childName) throws XmlException {
-		return addChild(new XmlNode(childName));
-	}
+  /**
+   * Getter for all of the children
+   * 
+   * @return An unmodifiable collection of nodes
+   */
+  public Collection<XmlNode> getAllChildren() {
+    if (children == null)
+      return Collections.unmodifiableCollection(new ArrayList<XmlNode>());
 
-	/**
-	 * Adds a child to this XmlNode
-	 * 
-	 * @param n Child node to add
-	 * @return This node
-	 * @throws XmlException If the child cannot be added, for instance if this
-	 *           node is self-closing or has value
-	 */
-	public XmlNode addChild(XmlNode n) throws XmlException {
-		if (selfClosing)
-			throw new XmlException("Cannot add children to self-closing XMLNode");
-		if (value != null)
-			throw new XmlException("Cannot add children to XMLNode with value");
+    return Collections.unmodifiableCollection(children);
+  }
 
-		if (children == null) {
-			children = new ArrayList<XmlNode>();
-		}
+  /**
+   * Getter for children with the specified name
+   * 
+   * @param nodeName Name to search for among child nodes
+   * @return A newly constructed list of child nodes with the specified name
+   */
+  public List<XmlNode> getChildren(String nodeName) {
+    List<XmlNode> val = new ArrayList<XmlNode>();
 
-		children.add(n);
-		return this;
-	}
+    if (children == null)
+      return val;
 
-	/**
-	 * Adds all of the specified nodes as children of this XmlNode
-	 * 
-	 * @param nodes The collection of XmlNodes to add
-	 * @return This XmlNode
-	 */
-	public XmlNode addAll(Collection<XmlNode> nodes) {
-		for (XmlNode node : nodes) {
-			addChild(node);
-		}
+    for (XmlNode node : children) {
+      if (node.name.equals(nodeName))
+        val.add(node);
+    }
 
-		return this;
-	}
+    return val;
+  }
 
-	/**
-	 * Shorthand for {@link #removeChild(XmlNode)}
-	 * 
-	 * @param childName Name of the child node to remove
-	 * @return The removed XmlNode
-	 */
-	public XmlNode removeChild(String childName) throws XmlException {
-		return removeChild(new XmlNode(childName));
-	}
+  /**
+   * Shorthand for {@link #addChild(XmlNode)}
+   * 
+   * @param childName Name of the child node to add
+   * @return This node
+   * @throws XmlException If the child cannot be added, for instance if this node is self-closing or has value
+   */
+  public XmlNode addChild(String childName) throws XmlException {
+    return addChild(new XmlNode(childName));
+  }
 
-	/**
-	 * Removes a child from this XmlNode
-	 * 
-	 * @param node The XmlNode to remove, as equivalent by {@link #equals(Object)}
-	 * @return The removed XmlNode
-	 */
-	public XmlNode removeChild(XmlNode node) {
-		children.remove(node);
+  /**
+   * Adds a child to this XmlNode. The child's parent will be set to this XmlNode.
+   * 
+   * @param n Child node to add
+   * @return This node
+   * @throws XmlException If the child cannot be added, for instance if this node is self-closing or has value
+   */
+  public XmlNode addChild(XmlNode n) throws XmlException {
+    if (selfClosing)
+      throw new XmlException("Cannot add children to self-closing XMLNode");
+    if (value != null)
+      throw new XmlException("Cannot add children to XMLNode with value");
 
-		if (children.isEmpty()) {
-			children = null;
-		}
+    n.parent = this;
 
-		return node;
-	}
+    if (children == null) {
+      children = new ArrayList<XmlNode>();
+    }
 
-	/**
-	 * Removes all child XmlNodes from this XmlNode
-	 * 
-	 * @return This XmlNode
-	 */
-	public XmlNode clearChildren() {
-		children = null;
-		return this;
-	}
+    children.add(n);
+    return this;
+  }
 
-	/**
-	 * Tells whether an attribute has been set on this node. It is good practice
-	 * to test if an attribute has been set before setting or deleting
-	 * 
-	 * @param key Key to test for
-	 * @return True if this attribute has been set
-	 */
-	public boolean hasAttribute(String key) {
-		return attributes.get(key) != null;
-	}
+  /**
+   * Adds all of the specified nodes as children of this XmlNode
+   * 
+   * @param nodes The collection of XmlNodes to add
+   * @return This XmlNode
+   */
+  public XmlNode addAll(Collection<XmlNode> nodes) {
+    for (XmlNode node : nodes) {
+      addChild(node);
+    }
 
-	/**
-	 * Getter for an attribute of this node
-	 * 
-	 * @param key Attribute name
-	 * @return Value assigned to the attribute name. Null if attribute has not
-	 *         been set
-	 */
-	public String getAttribute(String key) {
-		return attributes.get(key);
-	}
+    return this;
+  }
 
-	/**
-	 * Getter for all of the attribute keys
-	 * 
-	 * @return An unmodifiable collection of string keys
-	 */
-	public Collection<String> attributeKeys() {
-		return Collections.unmodifiableCollection(attributes.keySet());
-	}
+  /**
+   * Shorthand for {@link #removeChild(XmlNode)}
+   * 
+   * @param childName Name of the child node to remove
+   * @return The removed XmlNode
+   */
+  public XmlNode removeChild(String childName) throws XmlException {
+    return removeChild(new XmlNode(childName));
+  }
 
-	/**
-	 * Gets an attribute of this node, and calls Integer.parseInt for convenience
-	 * 
-	 * @param key Attribute name
-	 * @return Value assigned to the attribute name as Integer
-	 */
-	public int getIntAttribute(String key) {
-		return Integer.parseInt(getAttribute(key));
-	}
+  /**
+   * Removes a child from this XmlNode. The child's parent will be set to null.
+   * 
+   * @param node The XmlNode to remove, as equivalent by {@link #equals(Object)}
+   * @return The removed XmlNode
+   */
+  public XmlNode removeChild(XmlNode node) {
+    node.parent = null;
 
-	/**
-	 * Gets an attribute of this node, and calls Double.parseDouble for
-	 * convenience
-	 * 
-	 * @param key Attribute name
-	 * @return Value assigned to the attribute name as Double
-	 */
-	public double getDoubleAttribute(String key) {
-		return Double.parseDouble(getAttribute(key));
-	}
+    children.remove(node);
 
-	/**
-	 * Gets an attribute of this node, and calls Boolean.parseBoolean for
-	 * convenience
-	 * 
-	 * @param key Attribute name
-	 * @return Value assigned to the attribute name as Boolean
-	 */
-	public boolean getBoolAttribute(String key) {
-		return Boolean.parseBoolean(getAttribute(key));
-	}
+    if (children.isEmpty()) {
+      children = null;
+    }
 
-	/**
-	 * Adds a new attribute to this node
-	 * 
-	 * @param key Attribute name
-	 * @param value Attribute value
-	 * @return This node
-	 * @throws XmlException If the key is null, value is null, or was previously
-	 *           assigned to another value
-	 */
-	public XmlNode setAttribute(String key, String value) throws XmlException {
-		if (key == null || value == null || attributes.get(key) != null)
-			throw new XmlException("Cannot reset attribute value");
+    return node;
+  }
 
-		attributes.put(key, value);
-		return this;
-	}
+  /**
+   * Removes all child XmlNodes from this XmlNode
+   * 
+   * @return This XmlNode
+   */
+  public XmlNode clearChildren() {
+    for (XmlNode child : children) {
+      child.parent = null;
+    }
 
-	/**
-	 * Adds a new attribute to this node
-	 * 
-	 * @param key Attribute name
-	 * @param value Attribute value
-	 * @return This node
-	 * @throws XmlException If the key is null, value is null, or was previously
-	 *           assigned to another value
-	 */
-	public XmlNode setAttribute(String key, int value) throws XmlException {
-		return setAttribute(key, Integer.toString(value));
-	}
+    children = null;
 
-	/**
-	 * Adds a new attribute to this node
-	 * 
-	 * @param key Attribute name
-	 * @param value Attribute value
-	 * @return This node
-	 * @throws XmlException If the key is null, value is null, or was previously
-	 *           assigned to another value
-	 */
-	public XmlNode setAttribute(String key, double value) throws XmlException {
-		return setAttribute(key, Double.toString(value));
-	}
+    return this;
+  }
 
-	/**
-	 * Adds a new attribute to this node
-	 * 
-	 * @param key Attribute name
-	 * @param value Attribute value
-	 * @return This node
-	 * @throws XmlException If the key is null, value is null, or was previously
-	 *           assigned to another value
-	 */
-	public XmlNode setAttribute(String key, boolean value) throws XmlException {
-		return setAttribute(key, Boolean.toString(value));
-	}
+  /**
+   * Tells whether an attribute has been set on this node. It is good practice to test if an attribute has been set before setting or deleting
+   * 
+   * @param key Key to test for
+   * @return True if this attribute has been set
+   */
+  public boolean hasAttribute(String key) {
+    return attributes.get(key) != null;
+  }
 
-	/**
-	 * Removes an attribute from this node
-	 * 
-	 * @param key Attribute name
-	 * @return The old value
-	 * @throws XmlException If there was no such attribute assigned on this node,
-	 *           or key is null
-	 */
-	public String removeAttribute(String key) throws XmlException {
-		if (key == null || attributes.get(key) == null)
-			throw new XmlException("Attribute does not exist");
+  /**
+   * Getter for an attribute of this node
+   * 
+   * @param key Attribute name
+   * @return Value assigned to the attribute name. Null if attribute has not been set
+   */
+  public String getAttribute(String key) {
+    return attributes.get(key);
+  }
 
-		return attributes.remove(key);
-	}
+  /**
+   * Getter for all of the attribute keys
+   * 
+   * @return An unmodifiable collection of string keys
+   */
+  public Collection<String> attributeKeys() {
+    return Collections.unmodifiableCollection(attributes.keySet());
+  }
 
-	/**
-	 * Removes an attribute from this node, and calls Integer.parseInt on the old
-	 * value for convenience
-	 * 
-	 * @param key Attribute name
-	 * @return The old value
-	 * @throws XmlException If there was no such attribute assigned on this node,
-	 *           or key is null
-	 */
-	public int removeIntAttribute(String key) throws XmlException {
-		return Integer.parseInt(removeAttribute(key));
-	}
+  /**
+   * Gets an attribute of this node, and calls Integer.parseInt for convenience
+   * 
+   * @param key Attribute name
+   * @return Value assigned to the attribute name as Integer
+   */
+  public int getIntAttribute(String key) {
+    return Integer.parseInt(getAttribute(key));
+  }
 
-	/**
-	 * Removes an attribute from this node, and calls Double.parseDouble on the
-	 * old value for convenience
-	 * 
-	 * @param key Attribute name
-	 * @return The old value
-	 * @throws XmlException If there was no such attribute assigned on this node,
-	 *           or key is null
-	 */
-	public double removeDoubleAttribute(String key) throws XmlException {
-		return Double.parseDouble(removeAttribute(key));
-	}
+  /**
+   * Gets an attribute of this node, and calls Double.parseDouble for convenience
+   * 
+   * @param key Attribute name
+   * @return Value assigned to the attribute name as Double
+   */
+  public double getDoubleAttribute(String key) {
+    return Double.parseDouble(getAttribute(key));
+  }
 
-	/**
-	 * Removes an attribute from this node, and calls Boolean.parseBoolean on the
-	 * old value for convenience
-	 * 
-	 * @param key Attribute name
-	 * @return The old value
-	 * @throws XmlException If there was no such attribute assigned on this node,
-	 *           or key is null
-	 */
-	public boolean removeBoolAttribute(String key) {
-		return Boolean.parseBoolean(removeAttribute(key));
-	}
+  /**
+   * Gets an attribute of this node, and calls Boolean.parseBoolean for convenience
+   * 
+   * @param key Attribute name
+   * @return Value assigned to the attribute name as Boolean
+   */
+  public boolean getBoolAttribute(String key) {
+    return Boolean.parseBoolean(getAttribute(key));
+  }
 
-	/**
-	 * Removes all attributes from this XmlNode
-	 * 
-	 * @return This XmlNode
-	 */
-	public XmlNode clearAttributes() {
-		attributes = new HashMap<String, String>();
-		return this;
-	}
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   */
+  public XmlNode setAttribute(String key, String value) throws XmlException {
+    if (key == null || value == null || attributes.get(key) != null)
+      throw new XmlException("Cannot reset attribute value");
 
-	/**
-	 * Sets this node to be self-closing or not
-	 * 
-	 * @param b Whether the node should be self-closing
-	 * @return This node
-	 * @throws XmlException If this node has children, or a value, and b is true
-	 */
-	public XmlNode setSelfClosing(boolean b) throws XmlException {
-		if (children != null && b)
-			throw new XmlException("Cannot set self closing of XMLNode with children");
-		if (value != null && b)
-			throw new XmlException("Cannot set self closing of XMLNode with value");
+    attributes.put(key, value);
+    return this;
+  }
 
-		selfClosing = b;
-		return this;
-	}
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   */
+  public XmlNode setAttribute(String key, int value) throws XmlException {
+    return setAttribute(key, Integer.toString(value));
+  }
 
-	/**
-	 * Tells whether this node is self-closing
-	 * 
-	 * @return Whether this node is self-closing
-	 */
-	public boolean isSelfClosing() {
-		return selfClosing;
-	}
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   */
+  public XmlNode setAttribute(String key, double value) throws XmlException {
+    return setAttribute(key, Double.toString(value));
+  }
 
-	/**
-	 * Getter for the value of this node
-	 * 
-	 * @return The value, or null if one has not been assigned
-	 */
-	public String getValue() {
-		return value;
-	}
+  /**
+   * Adds a new attribute to this node
+   * 
+   * @param key Attribute name
+   * @param value Attribute value
+   * @return This node
+   * @throws XmlException If the key is null, value is null, or was previously assigned to another value
+   */
+  public XmlNode setAttribute(String key, boolean value) throws XmlException {
+    return setAttribute(key, Boolean.toString(value));
+  }
 
-	/**
-	 * Setter for the value of this node
-	 * 
-	 * @param s Value to set
-	 * @return This node
-	 * @throws XmlException If this node is self-closing or has children
-	 */
-	public XmlNode setValue(String s) throws XmlException {
-		if (selfClosing)
-			throw new XmlException("Cannot set value of self closing XMLNode");
-		if (children != null)
-			throw new XmlException("Cannot set value of XMLNode which has children");
+  /**
+   * Removes an attribute from this node
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XmlException If there was no such attribute assigned on this node, or key is null
+   */
+  public String removeAttribute(String key) throws XmlException {
+    if (key == null || attributes.get(key) == null)
+      throw new XmlException("Attribute does not exist");
 
-		value = s;
-		return this;
-	}
+    return attributes.remove(key);
+  }
 
-	public String toString() {
-		String value = "<" + getName();
+  /**
+   * Removes an attribute from this node, and calls Integer.parseInt on the old value for convenience
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XmlException If there was no such attribute assigned on this node, or key is null
+   */
+  public int removeIntAttribute(String key) throws XmlException {
+    return Integer.parseInt(removeAttribute(key));
+  }
 
-		if (!attributes.isEmpty()) {
-			value += "( ";
-			for (Map.Entry<String, String> attributePair : attributes.entrySet()) {
-				value += attributePair.getKey() + " ";
-			}
-			value += ") ";
-		}
-		if (selfClosing) {
-			value += " /";
-		}
+  /**
+   * Removes an attribute from this node, and calls Double.parseDouble on the old value for convenience
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XmlException If there was no such attribute assigned on this node, or key is null
+   */
+  public double removeDoubleAttribute(String key) throws XmlException {
+    return Double.parseDouble(removeAttribute(key));
+  }
 
-		return value + ">";
-	}
+  /**
+   * Removes an attribute from this node, and calls Boolean.parseBoolean on the old value for convenience
+   * 
+   * @param key Attribute name
+   * @return The old value
+   * @throws XmlException If there was no such attribute assigned on this node, or key is null
+   */
+  public boolean removeBoolAttribute(String key) {
+    return Boolean.parseBoolean(removeAttribute(key));
+  }
 
-	public String printToString(int depth, String tab) {
-		StringBuilder sb = new StringBuilder();
+  /**
+   * Removes all attributes from this XmlNode
+   * 
+   * @return This XmlNode
+   */
+  public XmlNode clearAttributes() {
+    attributes = new HashMap<String, String>();
+    return this;
+  }
 
-		for (int i = 0; i < depth; i++)
-			sb.append(tab);
+  /**
+   * Sets this node to be self-closing or not
+   * 
+   * @param b Whether the node should be self-closing
+   * @return This node
+   * @throws XmlException If this node has children, or a value, and b is true
+   */
+  public XmlNode setSelfClosing(boolean b) throws XmlException {
+    if (children != null && b)
+      throw new XmlException("Cannot set self closing of XMLNode with children");
+    if (value != null && b)
+      throw new XmlException("Cannot set self closing of XMLNode with value");
 
-		sb.append("<");
-		sb.append(name);
+    selfClosing = b;
+    return this;
+  }
 
-		for (Map.Entry<String, String> entry : attributes.entrySet()) {
-			sb.append(" ");
-			sb.append(entry.getKey());
-			sb.append("=\"");
-			sb.append(entry.getValue());
-			sb.append("\"");
-		}
+  /**
+   * Tells whether this node is self-closing
+   * 
+   * @return Whether this node is self-closing
+   */
+  public boolean isSelfClosing() {
+    return selfClosing;
+  }
 
-		if (isSelfClosing()) {
-			sb.append(" />");
-		}
-		else if (children != null) {
-			sb.append(">\n");
+  /**
+   * Getter for the value of this node
+   * 
+   * @return The value, or null if one has not been assigned
+   */
+  public String getValue() {
+    return value;
+  }
 
-			for (XmlNode node : children) {
-				sb.append(node.printToString(depth + 1, tab));
-				sb.append("\n");
-			}
+  /**
+   * Setter for the value of this node
+   * 
+   * @param s Value to set
+   * @return This node
+   * @throws XmlException If this node is self-closing or has children
+   */
+  public XmlNode setValue(String s) throws XmlException {
+    if (selfClosing)
+      throw new XmlException("Cannot set value of self closing XMLNode");
+    if (children != null)
+      throw new XmlException("Cannot set value of XMLNode which has children");
 
-			for (int i = 0; i < depth; i++)
-				sb.append(tab);
+    value = s;
+    return this;
+  }
 
-			sb.append("</");
-			sb.append(name);
-			sb.append(">");
-		}
-		else {
-			sb.append("> ");
+  public String toString() {
+    String value = "<" + getName();
 
-			if (value != null) {
-				sb.append(value);
-				sb.append(" ");
-			}
+    if (!attributes.isEmpty()) {
+      value += "( ";
+      for (Map.Entry<String, String> attributePair : attributes.entrySet()) {
+        value += attributePair.getKey() + " ";
+      }
+      value += ") ";
+    }
+    if (selfClosing) {
+      value += " /";
+    }
 
-			sb.append("</");
-			sb.append(name);
-			sb.append(">");
-		}
+    return value + ">";
+  }
 
-		return sb.toString();
-	}
+  public String printToString(int depth, String tab) {
+    StringBuilder sb = new StringBuilder();
 
-	public boolean equals(Object o) {
-		if (!(o instanceof XmlNode))
-			return false;
+    for (int i = 0; i < depth; i++)
+      sb.append(tab);
 
-		XmlNode node = (XmlNode) o;
+    sb.append("<");
+    sb.append(name);
 
-		if (!name.equals(node.name))
-			return false;
-		if (value != null && !value.equals(node.value))
-			return false;
-		if (value == null && node.value != null)
-			return false;
-		if (children != null && !children.equals(node.children))
-			return false;
-		if (children == null && node.children != null)
-			return false;
-		if (!attributes.equals(node.attributes))
-			return false;
+    for (Map.Entry<String, String> entry : attributes.entrySet()) {
+      sb.append(" ");
+      sb.append(entry.getKey());
+      sb.append("=\"");
+      sb.append(entry.getValue());
+      sb.append("\"");
+    }
 
-		return true;
-	}
+    if (isSelfClosing()) {
+      sb.append(" />");
+    }
+    else if (children != null) {
+      sb.append(">\n");
 
-	public int hashCode() {
-		return name.hashCode();
-	}
+      for (XmlNode node : children) {
+        sb.append(node.printToString(depth + 1, tab));
+        sb.append("\n");
+      }
 
-	private String name, value = null;
-	private boolean selfClosing = false;
-	private List<XmlNode> children = null;
-	private Map<String, String> attributes = new HashMap<String, String>();
+      for (int i = 0; i < depth; i++)
+        sb.append(tab);
+
+      sb.append("</");
+      sb.append(name);
+      sb.append(">");
+    }
+    else {
+      sb.append("> ");
+
+      if (value != null) {
+        sb.append(value);
+        sb.append(" ");
+      }
+
+      sb.append("</");
+      sb.append(name);
+      sb.append(">");
+    }
+
+    return sb.toString();
+  }
+
+  public boolean equals(Object o) {
+    if (!(o instanceof XmlNode))
+      return false;
+
+    XmlNode node = (XmlNode) o;
+
+    if (!name.equals(node.name))
+      return false;
+    if (value != null && !value.equals(node.value))
+      return false;
+    if (value == null && node.value != null)
+      return false;
+    if (children != null && !children.equals(node.children))
+      return false;
+    if (children == null && node.children != null)
+      return false;
+    if (!attributes.equals(node.attributes))
+      return false;
+
+    return true;
+  }
+
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  private String name, value = null;
+  private boolean selfClosing = false;
+  private List<XmlNode> children = null;
+  private XmlNode parent = null;
+  private Map<String, String> attributes = new HashMap<String, String>();
 }

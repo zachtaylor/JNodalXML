@@ -1,6 +1,7 @@
 package org.zachtaylor.jnodalxml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -191,6 +192,120 @@ public class XmlNodeTest extends TestCase {
     node.setAttribute("key", "value");
 
     assertFalse(other.equals(node));
+  }
+
+  public void testConstructorSpecifiedParent() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child", root);
+
+    assertEquals(child.getParent(), root);
+  }
+
+  public void testSetParent() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child");
+
+    child.setParent(root);
+
+    assertEquals(child.getParent(), root);
+  }
+
+  public void testSetNullParent() {
+    XmlNode child = new XmlNode("child");
+
+    child.setParent(null);
+
+    assertNull(child.getParent());
+  }
+
+  public void testSetParentWithPreviousParent() {
+    XmlNode root1 = new XmlNode("root");
+    XmlNode root2 = new XmlNode("root");
+    XmlNode child = new XmlNode("child", root1);
+
+    child.setParent(root2);
+
+    assertEquals(root1.getAllChildren().size(), 0);
+  }
+
+  public void testSetParentWithValue() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child");
+    root.setValue("value");
+
+    try {
+      child.setParent(root);
+      fail("Can't set a parent that has a value");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof XmlException);
+    }
+
+    assertNull(child.getParent());
+  }
+
+  public void testSetSelfClosingParent() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child");
+    root.setSelfClosing(true);
+
+    try {
+      child.setParent(root);
+      fail("Can't set a parent that is self closing");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof XmlException);
+    }
+
+    assertNull(child.getParent());
+  }
+
+  public void testUnspecifiedParentIsNull() {
+    XmlNode root = new XmlNode("root");
+
+    assertNull(root.getParent());
+  }
+
+  public void testAddChildNodeParentIsThis() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child");
+
+    root.addChild(child);
+
+    assertEquals(child.getParent(), root);
+  }
+
+  public void testAddChildrenParentIsThis() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child1 = new XmlNode("child1");
+    XmlNode child2 = new XmlNode("child2");
+
+    List<XmlNode> children = Arrays.asList(child1, child2);
+
+    root.addAll(children);
+
+    assertEquals(child1.getParent(), root);
+    assertEquals(child2.getParent(), root);
+  }
+
+  public void testRemoveChildNodeParentIsNull() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child", root);
+
+    root.removeChild(child);
+
+    assertNull(child.getParent());
+  }
+
+  public void testRemoveChildrenParentIsNull() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child1 = new XmlNode("child1", root);
+    XmlNode child2 = new XmlNode("child2", root);
+
+    root.clearChildren();
+
+    assertNull(child1.getParent());
+    assertNull(child2.getParent());
   }
 
   public void testChild() {
