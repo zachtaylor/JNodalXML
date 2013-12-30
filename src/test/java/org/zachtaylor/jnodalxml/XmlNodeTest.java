@@ -210,6 +210,14 @@ public class XmlNodeTest extends TestCase {
     assertEquals(child.getParent(), root);
   }
 
+  public void testSetNullParent() {
+    XmlNode child = new XmlNode("child");
+
+    child.setParent(null);
+
+    assertNull(child.getParent());
+  }
+
   public void testSetParentWithPreviousParent() {
     XmlNode root1 = new XmlNode("root");
     XmlNode root2 = new XmlNode("root");
@@ -218,6 +226,38 @@ public class XmlNodeTest extends TestCase {
     child.setParent(root2);
 
     assertEquals(root1.getAllChildren().size(), 0);
+  }
+
+  public void testSetParentWithValue() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child");
+    root.setValue("value");
+
+    try {
+      child.setParent(root);
+      fail("Can't set a parent that has a value");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof XmlException);
+    }
+
+    assertNull(child.getParent());
+  }
+
+  public void testSetSelfClosingParent() {
+    XmlNode root = new XmlNode("root");
+    XmlNode child = new XmlNode("child");
+    root.setSelfClosing(true);
+
+    try {
+      child.setParent(root);
+      fail("Can't set a parent that is self closing");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof XmlException);
+    }
+
+    assertNull(child.getParent());
   }
 
   public void testUnspecifiedParentIsNull() {

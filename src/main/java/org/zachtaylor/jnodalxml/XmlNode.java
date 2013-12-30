@@ -64,13 +64,16 @@ public class XmlNode {
    * 
    * @param parentNode The parent XmlNode
    * @return This XmlNode
+   * @throws XmlException If the parent cannot have a child, for instance if this parent is self-closing or has value
    */
-  public XmlNode setParent(XmlNode parentNode) {
+  public XmlNode setParent(XmlNode parentNode) throws XmlException {
     if (parent != null) {
       parent.removeChild(this);
     }
 
-    parent = parentNode;
+    if (parentNode != null) {
+      parentNode.addChild(this);
+    }
 
     return this;
   }
