@@ -18,6 +18,18 @@ public class XmlNode {
   }
 
   /**
+   * Constructor for XMLNode
+   * 
+   * @param nodeName Name of the node
+   * @param parentNode Parent XmlNode
+   */
+  public XmlNode(String nodeName, XmlNode parentNode) {
+    this(nodeName);
+
+    parentNode.addChild(this);
+  }
+
+  /**
    * Getter for name of the node
    * 
    * @return The tag name
@@ -34,6 +46,32 @@ public class XmlNode {
    */
   public XmlNode setName(String nodeName) {
     name = nodeName;
+    return this;
+  }
+
+  /**
+   * Getter for parent node
+   * 
+   * @return The parent of this XmlNode
+   */
+  public XmlNode getParent() {
+    return parent;
+  }
+
+  /**
+   * Setter for parent node. For nodes that already had a parent,
+   * this node will additionally be removed from that parent.
+   * 
+   * @param parentNode The parent XmlNode
+   * @return This XmlNode
+   */
+  public XmlNode setParent(XmlNode parentNode) {
+    if (parent != null) {
+      parent.removeChild(this);
+    }
+
+    parent = parentNode;
+
     return this;
   }
 
@@ -81,7 +119,7 @@ public class XmlNode {
   }
 
   /**
-   * Adds a child to this XmlNode
+   * Adds a child to this XmlNode. The child's parent will be set to this XmlNode.
    * 
    * @param n Child node to add
    * @return This node
@@ -92,6 +130,8 @@ public class XmlNode {
       throw new XmlException("Cannot add children to self-closing XMLNode");
     if (value != null)
       throw new XmlException("Cannot add children to XMLNode with value");
+
+    n.parent = this;
 
     if (children == null) {
       children = new ArrayList<XmlNode>();
@@ -126,12 +166,14 @@ public class XmlNode {
   }
 
   /**
-   * Removes a child from this XmlNode
+   * Removes a child from this XmlNode. The child's parent will be set to null.
    * 
    * @param node The XmlNode to remove, as equivalent by {@link #equals(Object)}
    * @return The removed XmlNode
    */
   public XmlNode removeChild(XmlNode node) {
+    node.parent = null;
+
     children.remove(node);
 
     if (children.isEmpty()) {
@@ -147,7 +189,12 @@ public class XmlNode {
    * @return This XmlNode
    */
   public XmlNode clearChildren() {
+    for (XmlNode child : children) {
+      child.parent = null;
+    }
+
     children = null;
+
     return this;
   }
 
@@ -468,5 +515,6 @@ public class XmlNode {
   private String name, value = null;
   private boolean selfClosing = false;
   private List<XmlNode> children = null;
+  private XmlNode parent = null;
   private Map<String, String> attributes = new HashMap<String, String>();
 }
