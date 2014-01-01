@@ -55,6 +55,14 @@ public class XmlAttribute {
     return Boolean.parseBoolean(value);
   }
 
+  public String toString() {
+    return String.format("%s = %s", key, value);
+  }
+
+  public String printToString() {
+    return String.format("%s=\"%s\"", key, value);
+  }
+
   public boolean equals(Object o) {
     if (!(o instanceof XmlAttribute)) {
       return false;
