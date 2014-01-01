@@ -81,7 +81,7 @@ public class XmlParser {
             if (!(token.getType() == XmlTokenType.QUOTE))
               throw new RuntimeException(" foo ");
 
-            nodes.peek().setAttribute(attrName, attrValue);
+            nodes.peek().addAttribute(attrName, attrValue);
             token = tokens.next();
           }
 
