@@ -376,20 +376,27 @@ public class XmlNode {
   }
 
   public String toString() {
-    String value = "<" + getName();
+    StringBuilder sb = new StringBuilder();
+
+    sb.append('<');
+    sb.append(getName());
 
     if (!attributes.isEmpty()) {
-      value += "( ";
+      sb.append("( ");
       for (XmlAttribute attribute : attributes.values()) {
-        value += attribute.getKey() + " ";
+        sb.append(attribute.toString());
+        sb.append(' ');
       }
-      value += ") ";
-    }
-    if (selfClosing) {
-      value += " /";
+      sb.append(") ");
     }
 
-    return value + ">";
+    if (selfClosing) {
+      sb.append(" /");
+    }
+
+    sb.append('>');
+
+    return sb.toString();
   }
 
   public String printToString(int depth, String tab) {
@@ -398,43 +405,45 @@ public class XmlNode {
     for (int i = 0; i < depth; i++)
       sb.append(tab);
 
-    sb.append("<");
+    sb.append('<');
     sb.append(name);
 
     for (XmlAttribute attribute : attributes.values()) {
-      sb.append(String.format(" %s=\"%s\"", attribute.getKey(), attribute.getValue()));
+      sb.append(' ');
+      sb.append(attribute.printToString());
     }
 
     if (isSelfClosing()) {
       sb.append(" />");
+      return sb.toString();
     }
-    else if (children != null) {
-      sb.append(">\n");
 
+    sb.append(">\n");
+
+    if (children != null) {
       for (XmlNode node : children) {
         sb.append(node.printToString(depth + 1, tab));
-        sb.append("\n");
+        sb.append('\n');
       }
-
-      for (int i = 0; i < depth; i++)
-        sb.append(tab);
-
-      sb.append("</");
-      sb.append(name);
-      sb.append(">");
     }
     else {
-      sb.append("> ");
+      for (int i = 0; i < depth + 1; i++) {
+        sb.append(tab);
+      }
 
       if (value != null) {
         sb.append(value);
-        sb.append(" ");
+        sb.append('\n');
       }
-
-      sb.append("</");
-      sb.append(name);
-      sb.append(">");
     }
+
+    for (int i = 0; i < depth; i++) {
+      sb.append(tab);
+    }
+
+    sb.append("</");
+    sb.append(name);
+    sb.append('>');
 
     return sb.toString();
   }
