@@ -222,6 +222,15 @@ public class XmlNode {
   }
 
   /**
+   * Getter for all attributes of this node
+   * 
+   * @return All attributes.
+   */
+  public List<XmlAttribute> getAllAttributes() {
+    return new ArrayList<XmlAttribute>(attributes.values());
+  }
+
+  /**
    * Getter for all of the attribute keys
    * 
    * @return An unmodifiable collection of string keys
